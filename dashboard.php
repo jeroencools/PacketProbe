@@ -57,6 +57,7 @@ $originalPackets = $_SESSION['originalPackets'];
 $modules = [
     'empty' => 'Please select...',
     'packetdetails' => 'Packet Details',
+    'protocolpie' => 'Protocol Pie Chart',
     'option1' => 'Option 1',
     'option2' => 'Option 2',
     'option3' => 'Option 3',
@@ -74,6 +75,21 @@ $selectedModules = [];
 for ($i = 0; $i < 6; $i++) {
     $selectedModules[$i] = isset($_POST["module$i"]) ? $_POST["module$i"] : 'empty';
 }
+
+// Add layout options
+$layoutOptions = [
+    '2x3' => ['rows' => 2, 'cols' => 3],
+    '3x2' => ['rows' => 3, 'cols' => 2],
+    '1x6' => ['rows' => 1, 'cols' => 6],
+    '6x1' => ['rows' => 6, 'cols' => 1],
+];
+// Preserve layout selection across all POSTs
+if (isset($_POST['layout'])) {
+    $_SESSION['layout'] = $_POST['layout'];
+}
+$selectedLayout = isset($_SESSION['layout']) ? $_SESSION['layout'] : '2x3';
+$layout = $layoutOptions[$selectedLayout];
+$totalCards = 6;
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -87,17 +103,46 @@ for ($i = 0; $i < 6; $i++) {
 </head>
 <body class="bg-dark text-light vh-100">
     <div class="container-fluid h-100 py-4">
-        <h1 class="mb-4 text-center">PacketProbe - Dashboard</h1>
+        <h1 class="mb-2 text-center">PacketProbe - Dashboard</h1>
+        <div class="d-flex justify-content-center mb-3">
+            <form method="post" class="d-flex align-items-center" id="layout-form" style="font-size: 0.95rem;">
+                <input type="hidden" name="csvFile" value="<?php echo htmlspecialchars($csvFile ?? ''); ?>">
+                <?php
+                // Preserve module selections
+                for ($j = 0; $j < $totalCards; $j++) {
+                    if (isset($selectedModules[$j])) {
+                        echo '<input type="hidden" name="module' . $j . '" value="' . htmlspecialchars($selectedModules[$j]) . '">';
+                    }
+                }
+                ?>
+                <label for="layout" class="me-2 mb-0">Grid Layout:</label>
+                <select name="layout" id="layout" class="form-select w-auto d-inline-block" onchange="this.form.submit()" style="margin-bottom:0;">
+                    <option value="2x3" <?php if ($selectedLayout === '2x3') echo 'selected'; ?>>2 x 3</option>
+                    <option value="3x2" <?php if ($selectedLayout === '3x2') echo 'selected'; ?>>3 x 2</option>
+                    <option value="1x6" <?php if ($selectedLayout === '1x6') echo 'selected'; ?>>1 x 6</option>
+                    <option value="6x1" <?php if ($selectedLayout === '6x1') echo 'selected'; ?>>6 x 1</option>
+                </select>
+            </form>
+        </div>
         <div class="row g-3 h-100" id="dashboard-grid" style="min-height: 0;">
-            <?php for ($i = 0; $i < 6; $i++): ?>
-            <div class="col-12 col-lg-6 d-flex align-items-stretch" style="min-height: 0;">
+            <?php
+            // Determine column class based on layout
+            $colClass = '';
+            if ($selectedLayout === '2x3') $colClass = 'col-12 col-md-6 col-lg-4';
+            elseif ($selectedLayout === '3x2') $colClass = 'col-12 col-md-4 col-lg-6';
+            elseif ($selectedLayout === '1x6') $colClass = 'col-12 col-md-2';
+            elseif ($selectedLayout === '6x1') $colClass = 'col-12';
+
+            for ($i = 0; $i < $totalCards; $i++): ?>
+            <div class="<?php echo $colClass; ?> d-flex align-items-stretch" style="min-height: 0;">
                 <div class="card h-100 bg-dark text-light border-secondary w-100" style="min-height: 0;">
-                    <div class="card-body d-flex flex-column overflow-auto" style="min-height: 0; max-height: 45vh;">
+                    <div class="card-body d-flex flex-column overflow-auto" style="min-height: 0; height: 100%;">
                         <form method="post" id="module-select-form-<?php echo $i; ?>">
                             <input type="hidden" name="csvFile" value="<?php echo htmlspecialchars($csvFile ?? ''); ?>">
+                            <input type="hidden" name="layout" value="<?php echo htmlspecialchars($selectedLayout); ?>">
                             <?php
-                            for ($j = 0; $j < 6; $j++) {
-                                if ($j !== $i) {
+                            for ($j = 0; $j < $totalCards; $j++) {
+                                if ($j !== $i && isset($selectedModules[$j])) {
                                     echo '<input type="hidden" name="module' . $j . '" value="' . htmlspecialchars($selectedModules[$j]) . '">';
                                 }
                             }
@@ -122,6 +167,9 @@ for ($i = 0; $i < 6; $i++) {
                             } elseif ($selectedModules[$i] === 'packetdetails') {
                                 $packets = $originalPackets;
                                 include __DIR__ . '/modules/PacketDetails.php';
+                            } elseif ($selectedModules[$i] === 'protocolpie') {
+                                $packets = $originalPackets;
+                                include __DIR__ . '/modules/ProtocolPie.php';
                             } else {
                                 echo '<div class="text-secondary">Placeholder for ' . htmlspecialchars($modules[$selectedModules[$i]]) . '</div>';
                             }
