@@ -1,14 +1,55 @@
 /* Custom styles for PacketProbe */
+html, body {
+    height: 100%;
+}
+
 body {
     background-color: #181a1b !important;
     color: #f8f9fa !important;
+    height: 100%;
+}
+
+.container-fluid, #dashboard-grid {
+    height: 100% !important;
+    min-height: 0 !important;
+}
+
+.row.h-100 {
+    height: 100% !important;
+    min-height: 0 !important;
+}
+
+.col-12, .col-lg-6 {
+    min-height: 0 !important;
+    height: 50vh;
+    display: flex;
+    align-items: stretch;
+}
+
+@media (max-width: 991.98px) {
+    .col-lg-6 {
+        height: auto;
+    }
+}
+
+.card.h-100 {
+    min-height: 0 !important;
+    height: 100% !important;
+    display: flex;
+    flex-direction: column;
+}
+
+.card-body {
+    min-height: 0 !important;
+    flex: 1 1 auto;
+    overflow: auto;
+    max-height: 70vh;
 }
 
 .card {
     background-color: #23272b !important;
     color: #f8f9fa !important;
     border-color: #343a40 !important;
-    min-height: 220px;
 }
 
 .form-select,
@@ -27,6 +68,25 @@ body {
 
 label.form-label {
     color: #f8f9fa;
+}
+
+/* PacketDetails table enhancements */
+.table-dark {
+    --bs-table-bg: #23272b;
+    --bs-table-striped-bg: #202326;
+    --bs-table-striped-color: #f8f9fa;
+    --bs-table-border-color: #343a40;
+}
+
+.table th, .table td {
+    vertical-align: middle;
+    font-size: 0.95rem;
+}
+
+.table.table-dark.small th,
+.table.table-dark.small td {
+    font-size: 0.85rem;
+    padding: 0.18rem 0.35rem;
 }
 
 @media (max-width: 767.98px) {

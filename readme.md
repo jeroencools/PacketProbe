@@ -8,6 +8,7 @@ PacketProbe is an educational web application designed for students to analyze p
 - **Protocol Exploration:** Switch between multiple protocol views and options in each dashboard section.
 - **User-Friendly Interface:** Built with Bootstrap for responsive and accessible design.
 - **Educational Focus:** Ideal for classroom use, labs, or self-study.
+- **Desktop Recommended:** Optimized for desktop use; mobile support is limited.
 
 ## Getting Started
 

@@ -10,7 +10,7 @@
 <body>
     <div class="container d-flex flex-column justify-content-center align-items-center min-vh-100">
         <h1 class="mb-4">PacketProbe</h1>
-        <form action="dashboard.php" method="get" enctype="multipart/form-data" class="w-100" style="max-width:400px;">
+        <form action="dashboard.php" method="post" enctype="multipart/form-data" class="w-100" style="max-width:400px;">
             <div class="mb-3">
                 <label for="csvFile" class="form-label">Upload Network Traffic (.csv)</label>
                 <input class="form-control" type="file" id="csvFile" name="csvFile" accept=".csv" required>
