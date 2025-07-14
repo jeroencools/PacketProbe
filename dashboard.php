@@ -34,24 +34,28 @@ if (
     $csvFile = null;
 }
 
-// Always parse $packets from the session-stored file if possible
-$originalPackets = [];
-if ($csvFile && is_readable($csvFile)) {
-    if (($handle = fopen($csvFile, "r")) !== false) {
-        $headers = fgetcsv($handle, 0, ",", '"', "\\");
-        if ($headers && isset($headers[0])) {
-            $headers[0] = preg_replace('/^\xEF\xBB\xBF/', '', $headers[0]);
+// Always parse $originalPackets from the session-stored file if possible
+if (!isset($_SESSION['originalPackets'])) {
+    $_SESSION['originalPackets'] = [];
+    if ($csvFile && is_readable($csvFile)) {
+        if (($handle = fopen($csvFile, "r")) !== false) {
+            $headers = fgetcsv($handle, 0, ",", '"', "\\");
+            if ($headers && isset($headers[0])) {
+                $headers[0] = preg_replace('/^\xEF\xBB\xBF/', '', $headers[0]);
+            }
+            while (($data = fgetcsv($handle, 0, ",", '"', "\\")) !== false) {
+                if (count($data) !== count($headers)) continue;
+                $_SESSION['originalPackets'][] = array_combine($headers, $data);
+            }
+            fclose($handle);
         }
-        while (($data = fgetcsv($handle, 0, ",", '"', "\\")) !== false) {
-            if (count($data) !== count($headers)) continue;
-            $originalPackets[] = array_combine($headers, $data);
-        }
-        fclose($handle);
     }
 }
+$originalPackets = $_SESSION['originalPackets'];
 
-// List of available modules for selection
+// List of available modules for selection (add 'empty' as the first/default)
 $modules = [
+    'empty' => 'Please select...',
     'packetdetails' => 'Packet Details',
     'option1' => 'Option 1',
     'option2' => 'Option 2',
@@ -65,10 +69,10 @@ $modules = [
     'option10' => 'Option 10',
 ];
 
-// Get selected modules for each card (from POST or default to packetdetails)
+// Get selected modules for each card (from POST or default to 'empty')
 $selectedModules = [];
 for ($i = 0; $i < 6; $i++) {
-    $selectedModules[$i] = isset($_POST["module$i"]) ? $_POST["module$i"] : 'packetdetails';
+    $selectedModules[$i] = isset($_POST["module$i"]) ? $_POST["module$i"] : 'empty';
 }
 ?>
 <!DOCTYPE html>
@@ -113,7 +117,9 @@ for ($i = 0; $i < 6; $i++) {
                         </form>
                         <div class="section-content mt-1" id="section-content-<?php echo $i; ?>">
                             <?php
-                            if ($selectedModules[$i] === 'packetdetails') {
+                            if ($selectedModules[$i] === 'empty') {
+                                echo '<div class="text-secondary">Please select card content.</div>';
+                            } elseif ($selectedModules[$i] === 'packetdetails') {
                                 $packets = $originalPackets;
                                 include __DIR__ . '/modules/PacketDetails.php';
                             } else {
