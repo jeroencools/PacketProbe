@@ -5,9 +5,13 @@ session_start();
 // Register a shutdown function to clean up the temp file if the session is destroyed
 register_shutdown_function(function() {
     if (session_status() === PHP_SESSION_ACTIVE && isset($_SESSION['csvFile'])) {
-        if (!isset($_SESSION['keep_csv']) && file_exists($_SESSION['csvFile'])) {
+        // Only remove the temp file and session if the session is destroyed (not on every request)
+        if (isset($_SESSION['destroy_csv']) && $_SESSION['destroy_csv'] && file_exists($_SESSION['csvFile'])) {
             @unlink($_SESSION['csvFile']);
             unset($_SESSION['csvFile']);
+            unset($_SESSION['originalPackets']);
+            unset($_SESSION['csvFileName']);
+            unset($_SESSION['destroy_csv']);
         }
     }
 });
@@ -17,26 +21,43 @@ $packets = [];
 if (
     isset($_FILES['csvFile']) && is_uploaded_file($_FILES['csvFile']['tmp_name']) && $_FILES['csvFile']['error'] === UPLOAD_ERR_OK
 ) {
-    // Save uploaded file to a temp location and store path in session
+    // Remove previous temp file if it exists and is different from the new one
+    if (isset($_SESSION['csvFile']) && file_exists($_SESSION['csvFile'])) {
+        @unlink($_SESSION['csvFile']);
+    }
     $tmpName = tempnam(sys_get_temp_dir(), 'pktcsv_');
     move_uploaded_file($_FILES['csvFile']['tmp_name'], $tmpName);
     $_SESSION['csvFile'] = $tmpName;
     $csvFile = $tmpName;
-} elseif (isset($_POST['csvFile']) && $_POST['csvFile'] && is_readable($_POST['csvFile'])) {
+    $_SESSION['csvFileName'] = $_FILES['csvFile']['name'];
+
+    // Parse the CSV file directly into $originalPackets (not just session)
+    $originalPackets = [];
+    if (($handle = fopen($csvFile, "r")) !== false) {
+        $headers = fgetcsv($handle, 0, ",", '"', "\\");
+        if ($headers && isset($headers[0])) {
+            $headers[0] = preg_replace('/^\xEF\xBB\xBF/', '', $headers[0]);
+        }
+        while (($data = fgetcsv($handle, 0, ",", '"', "\\")) !== false) {
+            if (count($data) !== count($headers)) continue;
+            $originalPackets[] = array_combine($headers, $data);
+        }
+        fclose($handle);
+    }
+    $_SESSION['originalPackets'] = $originalPackets;
+    // Force reload to clear POST and prevent reusing old file on refresh
+    header("Location: " . $_SERVER['PHP_SELF']);
+    exit;
+} elseif (
+    isset($_POST['csvFile']) && $_POST['csvFile'] && is_readable($_POST['csvFile'])
+) {
     $csvFile = $_POST['csvFile'];
     $_SESSION['csvFile'] = $csvFile;
-} elseif (isset($_SESSION['csvFile']) && is_readable($_SESSION['csvFile'])) {
-    $csvFile = $_SESSION['csvFile'];
-} elseif (isset($_GET['csvFile'])) {
-    $csvFile = $_GET['csvFile'];
-    $_SESSION['csvFile'] = $csvFile;
-} else {
-    $csvFile = null;
-}
-
-// Always parse $originalPackets from the session-stored file if possible
-if (!isset($_SESSION['originalPackets'])) {
-    $_SESSION['originalPackets'] = [];
+    if (isset($_POST['csvFileName'])) {
+        $_SESSION['csvFileName'] = $_POST['csvFileName'];
+    }
+    // Always re-parse the CSV file on POST to $originalPackets
+    $originalPackets = [];
     if ($csvFile && is_readable($csvFile)) {
         if (($handle = fopen($csvFile, "r")) !== false) {
             $headers = fgetcsv($handle, 0, ",", '"', "\\");
@@ -45,13 +66,76 @@ if (!isset($_SESSION['originalPackets'])) {
             }
             while (($data = fgetcsv($handle, 0, ",", '"', "\\")) !== false) {
                 if (count($data) !== count($headers)) continue;
-                $_SESSION['originalPackets'][] = array_combine($headers, $data);
+                $originalPackets[] = array_combine($headers, $data);
             }
             fclose($handle);
         }
     }
+    $_SESSION['originalPackets'] = $originalPackets;
+} elseif (
+    isset($_SESSION['csvFile']) && is_readable($_SESSION['csvFile'])
+) {
+    $csvFile = $_SESSION['csvFile'];
+    // Always re-parse the CSV file from session file if available
+    $originalPackets = [];
+    if ($csvFile && is_readable($csvFile)) {
+        if (($handle = fopen($csvFile, "r")) !== false) {
+            $headers = fgetcsv($handle, 0, ",", '"', "\\");
+            if ($headers && isset($headers[0])) {
+                $headers[0] = preg_replace('/^\xEF\xBB\xBF/', '', $headers[0]);
+            }
+            while (($data = fgetcsv($handle, 0, ",", '"', "\\")) !== false) {
+                if (count($data) !== count($headers)) continue;
+                $originalPackets[] = array_combine($headers, $data);
+            }
+            fclose($handle);
+        }
+    }
+    $_SESSION['originalPackets'] = $originalPackets;
+} elseif (
+    isset($_GET['csvFile'])
+) {
+    $csvFile = $_GET['csvFile'];
+    $_SESSION['csvFile'] = $csvFile;
+    $originalPackets = [];
+    if ($csvFile && is_readable($csvFile)) {
+        if (($handle = fopen($csvFile, "r")) !== false) {
+            $headers = fgetcsv($handle, 0, ",", '"', "\\");
+            if ($headers && isset($headers[0])) {
+                $headers[0] = preg_replace('/^\xEF\xBB\xBF/', '', $headers[0]);
+            }
+            while (($data = fgetcsv($handle, 0, ",", '"', "\\")) !== false) {
+                if (count($data) !== count($headers)) continue;
+                $originalPackets[] = array_combine($headers, $data);
+            }
+            fclose($handle);
+        }
+    }
+    $_SESSION['originalPackets'] = $originalPackets;
+} else {
+    $csvFile = null;
+    $originalPackets = [];
+    // Do not clear session here!
+    // $_SESSION['originalPackets'] = [];
+    // $_SESSION['csvFileName'] = null;
 }
-$originalPackets = $_SESSION['originalPackets'];
+
+// After parsing $originalPackets, add this debug output (for development only):
+if (!empty($originalPackets)) {
+    echo '<div style="color:lime;background:#222;padding:6px 12px;margin:10px 0;text-align:center;">';
+    echo 'CSV upload and parse successful. Parsed rows: ' . count($originalPackets);
+    echo '</div>';
+} elseif (
+    isset($_FILES['csvFile']) && is_uploaded_file($_FILES['csvFile']['tmp_name'])
+) {
+    echo '<div style="color:orange;background:#222;padding:6px 12px;margin:10px 0;text-align:center;">';
+    echo 'CSV upload attempted, but no rows parsed.';
+    echo '</div>';
+} else {
+    echo '<div style="color:gray;background:#222;padding:6px 12px;margin:10px 0;text-align:center;">';
+    echo 'No CSV parsed yet.';
+    echo '</div>';
+}
 
 // List of available modules for selection (add 'empty' as the first/default)
 $modules = [
