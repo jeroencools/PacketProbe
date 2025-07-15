@@ -190,6 +190,8 @@ $totalCards = 6;
         <h1 class="mb-2 text-center">PacketProbe - Dashboard</h1>
         <div class="d-flex justify-content-center mb-3">
             <form method="post" class="d-flex align-items-center" id="layout-form" style="font-size: 0.95rem;">
+                <!-- Back button to upload page -->
+                <a href="index.php" class="btn btn-secondary me-3" style="min-width: 90px;">&larr; Back</a>
                 <input type="hidden" name="csvFile" value="<?php echo htmlspecialchars($csvFile ?? ''); ?>">
                 <?php
                 // Preserve module selections

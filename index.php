@@ -17,6 +17,7 @@
             </div>
             <button type="submit" class="btn btn-primary w-100">Upload</button>
         </form>
+        <a href="randomcsv.php" class="btn btn-outline-secondary mt-3 w-100" style="max-width:400px;">Create a random CSV</a>
     </div>
 </body>
 </html>
