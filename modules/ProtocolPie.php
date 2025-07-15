@@ -19,8 +19,18 @@ $chartId = 'protocolPieChart_' . uniqid();
 <div style="flex:1 1 auto; display:flex; flex-direction:column; justify-content:stretch; align-items:stretch; min-height:0; height:100%;">
     <canvas id="<?php echo $chartId; ?>" style="width:100% !important; height:100% !important; flex:1 1 auto; min-height:0;"></canvas>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
+<?php
+if (empty($GLOBALS['chartjs_loaded'])) {
+    $GLOBALS['chartjs_loaded'] = true;
+    // Load Chart.js and datalabels plugin
+    echo '<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>';
+    echo '<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>';
+} elseif (empty($GLOBALS['chartjs_datalabels_loaded'])) {
+    // Only load datalabels plugin if not loaded yet
+    echo '<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>';
+}
+$GLOBALS['chartjs_datalabels_loaded'] = true;
+?>
 <script>
 document.addEventListener("DOMContentLoaded", function() {
     var ctx = document.getElementById('<?php echo $chartId; ?>').getContext('2d');

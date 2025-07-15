@@ -142,6 +142,7 @@ $modules = [
     'empty' => 'Please select...',
     'packetdetails' => 'Packet Details',
     'protocolpie' => 'Protocol Pie Chart',
+    'toptalkers' => 'Top Talkers',
     'option1' => 'Option 1',
     'option2' => 'Option 2',
     'option3' => 'Option 3',
@@ -256,6 +257,9 @@ $totalCards = 6;
                             } elseif ($selectedModules[$i] === 'protocolpie') {
                                 $packets = $originalPackets;
                                 include __DIR__ . '/modules/ProtocolPie.php';
+                            } elseif ($selectedModules[$i] === 'toptalkers') {
+                                $packets = $originalPackets;
+                                include __DIR__ . '/modules/TopTalkers.php';
                             } else {
                                 echo '<div class="text-secondary">Placeholder for ' . htmlspecialchars($modules[$selectedModules[$i]]) . '</div>';
                             }
