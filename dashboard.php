@@ -143,6 +143,7 @@ $modules = [
     'packetdetails' => 'Packet Details',
     'protocolpie' => 'Protocol Pie Chart',
     'toptalkers' => 'Top Talkers',
+    'conversationmatrix' => 'Conversation Matrix',
     'option1' => 'Option 1',
     'option2' => 'Option 2',
     'option3' => 'Option 3',
@@ -260,6 +261,9 @@ $totalCards = 6;
                             } elseif ($selectedModules[$i] === 'toptalkers') {
                                 $packets = $originalPackets;
                                 include __DIR__ . '/modules/TopTalkers.php';
+                            } elseif ($selectedModules[$i] === 'conversationmatrix') {
+                                $packets = $originalPackets;
+                                include __DIR__ . '/modules/ConversationMatrix.php';
                             } else {
                                 echo '<div class="text-secondary">Placeholder for ' . htmlspecialchars($modules[$selectedModules[$i]]) . '</div>';
                             }
