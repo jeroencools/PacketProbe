@@ -10,18 +10,21 @@ if (empty($packets) || !is_array($packets)) {
 $srcKeys = ['src', 'source', 'ip.src', 'Source', 'Src', 'Source IP', 'ip source'];
 $dstKeys = ['dst', 'destination', 'ip.dst', 'Destination', 'Dst', 'Destination IP', 'ip destination'];
 
-function findKey($headers, $candidates) {
-    foreach ($candidates as $cand) {
-        foreach ($headers as $h) {
-            if (strcasecmp($h, $cand) === 0) return $h;
+// Avoid function redeclaration if this module is included multiple times
+if (!function_exists('conversationmatrix_findKey')) {
+    function conversationmatrix_findKey($headers, $candidates) {
+        foreach ($candidates as $cand) {
+            foreach ($headers as $h) {
+                if (strcasecmp($h, $cand) === 0) return $h;
+            }
         }
+        return null;
     }
-    return null;
 }
 
 $headers = array_keys($packets[0]);
-$srcCol = findKey($headers, $srcKeys);
-$dstCol = findKey($headers, $dstKeys);
+$srcCol = conversationmatrix_findKey($headers, $srcKeys);
+$dstCol = conversationmatrix_findKey($headers, $dstKeys);
 
 if (!$srcCol || !$dstCol) {
     echo '<div class="text-danger">Could not detect source/destination IP columns in CSV.</div>';
