@@ -144,6 +144,7 @@ $modules = [
     'protocolpie' => 'Protocol Pie Chart',
     'toptalkers' => 'Top Talkers',
     'conversationmatrix' => 'Conversation Matrix',
+    'networktopology' => 'Network Topology', // <-- Added new module
     'option1' => 'Option 1',
     'option2' => 'Option 2',
     'option3' => 'Option 3',
@@ -264,6 +265,9 @@ $totalCards = 6;
                             } elseif ($selectedModules[$i] === 'conversationmatrix') {
                                 $packets = $originalPackets;
                                 include __DIR__ . '/modules/ConversationMatrix.php';
+                            } elseif ($selectedModules[$i] === 'networktopology') {
+                                $packets = $originalPackets;
+                                include __DIR__ . '/modules/NetworkTopology.php';
                             } else {
                                 echo '<div class="text-secondary">Placeholder for ' . htmlspecialchars($modules[$selectedModules[$i]]) . '</div>';
                             }
@@ -277,5 +281,9 @@ $totalCards = 6;
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="assets/js/dashboard.js"></script>
+    <!-- Cytoscape.js CDN (only loaded if Network Topology module is present) -->
+    <?php if (in_array('networktopology', $selectedModules)): ?>
+    <script src="https://unpkg.com/cytoscape@3.24.0/dist/cytoscape.min.js"></script>
+    <?php endif; ?>
 </body>
 </html>
