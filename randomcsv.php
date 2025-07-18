@@ -3,13 +3,37 @@ header('Content-Type: text/csv');
 header('Content-Disposition: attachment; filename="example.csv"');
 
 // Column headers
+
 $headers = ['No.','Time','Source','Destination','Protocol','Length','Info'];
 echo '"' . implode('","', $headers) . '"' . "\r\n";
 
 // Helper functions
+// Only 20 internal IPs
+$internal_ips = [];
+for ($i = 2; $i <= 21; $i++) {
+    $internal_ips[] = "10.30.0.$i";
+}
+
+// External IPs for Google, Youtube, Facebook
+$external_targets = [
+    ['ip' => '142.250.190.78', 'host' => 'google.com'],      // Google
+    ['ip' => '142.250.190.206', 'host' => 'youtube.com'],    // Youtube
+    ['ip' => '157.240.1.35', 'host' => 'facebook.com']       // Facebook
+];
+function rand_external_ip() {
+    global $external_targets;
+    $target = $external_targets[array_rand($external_targets)];
+    return $target['ip'];
+}
+function rand_external_host() {
+    global $external_targets;
+    $target = $external_targets[array_rand($external_targets)];
+    return $target['host'];
+}
 function rand_ip($private = true) {
+    global $internal_ips;
     if ($private) {
-        return "10.30.0." . rand(2, 254);
+        return $internal_ips[array_rand($internal_ips)];
     } else {
         return rand(31,223) . '.' . rand(0,255) . '.' . rand(0,255) . '.' . rand(1,254);
     }
@@ -132,70 +156,169 @@ $rows[] = [$line++, inc_time($base_time, $micros), $server, $client, 'TLSv1.3', 
 $rows[] = [$line++, inc_time($base_time, $micros), $server, $client, 'TLSv1.3', 709, "Application Data, Application Data, Application Data"];
 
 // 8. Add more mixed traffic to reach 250 lines
-while (count($rows) < 250) {
-    $proto = ['UDP','TCP','DNS','HTTP','HTTPS','ICMP','ARP','TLSv1.3'][array_rand(['UDP','TCP','DNS','HTTP','HTTPS','ICMP','ARP','TLSv1.3'])];
-    $src = rand_ip(rand(0,1));
-    $dst = rand_ip(rand(0,1));
-    $len = rand(54, 1500);
-    $info = '';
-    switch ($proto) {
-        case 'UDP':
-            $svc = $udp_services[array_rand($udp_services)];
-            $info = $svc['desc'] . " traffic $src > $dst port " . $svc['port'];
-            break;
-        case 'TCP':
-            $svc = $tcp_services[array_rand($tcp_services)];
-            $sport = rand(40000,60000);
-            $info = "$sport  >  {$svc['port']} " . $tcp_flags[array_rand($tcp_flags)] . " Seq=" . rand(0,10000) . " Ack=" . rand(0,10000) . " Win=" . rand(32000,65535) . " Len=" . rand(0,1000);
-            break;
-        case 'DNS':
-            $domain = $dns_domains[array_rand($dns_domains)];
-            $query_id = dechex(rand(1000,9999));
-            if (rand(0,1)) {
-                $src = rand_ip(true); $dst = "10.30.0.1";
-                $info = "Standard query 0x$query_id A $domain";
+function is_internal($ip) {
+    return preg_match('/^10\\.30\\.0\\.(?:[1-9][0-9]?|1[0-9][0-9]|2[0-4][0-9]|25[0-4])$/', $ip);
+}
+function is_firewall($ip) {
+    return $ip === '10.30.0.1';
+}
+function is_external($ip) {
+    return !is_internal($ip) && !is_firewall($ip);
+}
+// 350 lines, with bursts and more realism
+$total_lines = 350;
+$burst_size = 10;
+$burst_probability = 20; // percent
+while (count($rows) < $total_lines) {
+    $burst = rand(1,100) <= $burst_probability;
+    $burst_count = $burst ? rand(3, $burst_size) : 1;
+    for ($b = 0; $b < $burst_count && count($rows) < $total_lines; $b++) {
+        $is_external = rand(1, 100) <= 70;
+        $proto_pool = ['UDP','TCP','DNS','HTTP','HTTPS','ICMP','ARP','TLSv1.3','SMTP','POP3','IMAP','FTP','QUIC'];
+        $proto = $proto_pool[array_rand($proto_pool)];
+        $src = null;
+        $dst = null;
+        $len = rand(54, 1500);
+        $info = '';
+        // $comment = '';
+        // NAT simulation: for external, show both pre- and post-NAT
+        if ($is_external) {
+            $internal = rand_ip(true);
+            $external = rand_external_ip();
+            $host = rand_external_host();
+            $client_port = rand(40000, 60000);
+            $nat_port = rand(40000, 60000);
+            $service = $tcp_services[array_rand($tcp_services)];
+            $direction = rand(0,1);
+            if ($direction) {
+                // Outbound: internal -> firewall (pre-NAT)
+                $src = $internal;
+                $dst = '10.30.0.1';
+                $info = "$client_port  >  {$service['port']} [SYN] Seq=0 Win=65535 Len=0";
+                $rows[] = [$line++, inc_time($base_time, $micros), $src, $dst, 'TCP', 66, $info];
+                // Outbound: firewall -> external (post-NAT)
+                $src = '10.30.0.1';
+                $dst = $external;
+                $info = "$nat_port  >  {$service['port']} [SYN] Seq=0 Win=65535 Len=0";
+                $rows[] = [$line++, inc_time($base_time, $micros), $src, $dst, 'TCP', 66, $info];
+                // Optionally add HTTP/HTTPS/QUIC/SMTP/POP3/IMAP/FTP/QUIC
+                if (in_array($proto, ['HTTP','HTTPS','QUIC'])) {
+                    $method = ['GET','POST','HEAD'][array_rand(['GET','POST','HEAD'])];
+                    $path = $http_paths[array_rand($http_paths)];
+                    $ua = ['Mozilla/5.0','curl/7.68.0','Wget/1.20.3','Edge/18.18363'][array_rand(['Mozilla/5.0','curl/7.68.0','Wget/1.20.3','Edge/18.18363'])];
+                    $info = "$method $path HTTP/1.1 Host: $host User-Agent: $ua";
+                    $rows[] = [$line++, inc_time($base_time, $micros), '10.30.0.1', $external, $proto, rand(200,2000), $info];
+                }
+                if ($proto === 'SMTP') {
+                    $info = "MAIL FROM:<user@$host> RCPT TO:<someone@gmail.com>";
+                    $rows[] = [$line++, inc_time($base_time, $micros), '10.30.0.1', $external, 'SMTP', 180, $info];
+                }
+                if ($proto === 'POP3') {
+                    $info = "+OK POP3 server ready";
+                    $rows[] = [$line++, inc_time($base_time, $micros), $external, '10.30.0.1', 'POP3', 120, $info];
+                }
+                if ($proto === 'IMAP') {
+                    $info = "* OK IMAP4rev1 Service Ready";
+                    $rows[] = [$line++, inc_time($base_time, $micros), $external, '10.30.0.1', 'IMAP', 120, $info];
+                }
+                if ($proto === 'FTP') {
+                    $info = "USER anonymous";
+                    $rows[] = [$line++, inc_time($base_time, $micros), '10.30.0.1', $external, 'FTP', 90, $info];
+                }
             } else {
-                $src = "10.30.0.1"; $dst = rand_ip(true);
-                $info = "Standard query response 0x$query_id A $domain A " . rand_ip(false);
+                // Inbound: external -> firewall (pre-NAT)
+                $src = $external;
+                $dst = '10.30.0.1';
+                $info = "443  >  $nat_port [SYN, ACK] Seq=0 Ack=1 Win=65535 Len=0";
+                $rows[] = [$line++, inc_time($base_time, $micros), $src, $dst, 'TCP', 66, $info];
+                // Inbound: firewall -> internal (post-NAT)
+                $src = '10.30.0.1';
+                $dst = $internal;
+                $info = "443  >  $client_port [SYN, ACK] Seq=0 Ack=1 Win=65535 Len=0";
+                $rows[] = [$line++, inc_time($base_time, $micros), $src, $dst, 'TCP', 66, $info];
             }
-            $len = rand(60,120);
-            break;
-        case 'HTTP':
-            $method = ['GET','POST','HEAD'][array_rand(['GET','POST','HEAD'])];
-            $path = $http_paths[array_rand($http_paths)];
-            $host = $dns_domains[array_rand($dns_domains)];
-            $info = "$method $path HTTP/1.1 Host: $host";
-            $len = rand(200, 2000);
-            break;
-        case 'HTTPS':
-            $info = "Encrypted Application Data";
-            $len = rand(200, 2000);
-            break;
-        case 'ICMP':
-            $icmp = $icmp_types[array_rand($icmp_types)];
-            $info = "$icmp id=" . rand(1000,9999) . " seq=" . rand(1,10);
-            $len = rand(60,120);
-            break;
-        case 'ARP':
-            if (rand(0,1)) {
-                $info = "Who has $dst? Tell $src";
-            } else {
-                $info = "Reply $dst is-at " . rand_mac();
+            // Simulate some errors/anomalies
+            if (rand(1,100) <= 5) {
+                $info = "Destination unreachable";
+            $rows[] = [$line++, inc_time($base_time, $micros), $external, '10.30.0.1', 'ICMP', 98, $info];
             }
-            $len = 42;
-            break;
-        case 'TLSv1.3':
-            $tls_msgs = [
-                "Client Hello (SNI=" . $dns_domains[array_rand($dns_domains)] . ")",
-                "Server Hello, Change Cipher Spec, Application Data",
-                "Application Data, Application Data, Application Data",
-                "Change Cipher Spec, Application Data, Application Data"
-            ];
-            $info = $tls_msgs[array_rand($tls_msgs)];
-            $len = rand(200, 3000);
-            break;
+        } else {
+            // Other: DNS, ARP, ICMP, etc. (internal <-> firewall)
+            switch ($proto) {
+                case 'DNS':
+                    $domain = $dns_domains[array_rand($dns_domains)];
+                    $query_id = dechex(rand(1000,9999));
+                    if (rand(0,1)) {
+                        $src = rand_ip(true); $dst = "10.30.0.1";
+                        $info = "Standard query 0x$query_id A $domain";
+                        // $comment = 'DNS query';
+                    } else {
+                        $src = "10.30.0.1"; $dst = rand_ip(true);
+                        $info = "Standard query response 0x$query_id A $domain A " . rand_external_ip();
+                        // $comment = 'DNS response';
+                    }
+                    $len = rand(60,120);
+                    break;
+                case 'ICMP':
+                    $icmp = $icmp_types[array_rand($icmp_types)];
+                    if (rand(0,1)) {
+                        $src = rand_ip(true); $dst = '10.30.0.1';
+                    } else {
+                        $src = '10.30.0.1'; $dst = rand_ip(true);
+                    }
+                    $info = "$icmp id=" . rand(1000,9999) . " seq=" . rand(1,10);
+                    // $comment = 'ICMP';
+                    $len = rand(60,120);
+                    break;
+                case 'ARP':
+                    if (rand(0,1)) {
+                        $src = rand_ip(true); $dst = '10.30.0.1';
+                        $info = "Who has $dst? Tell $src";
+                        // $comment = 'ARP request';
+                    } else {
+                        $src = '10.30.0.1'; $dst = rand_ip(true);
+                        $info = "Reply $dst is-at " . rand_mac();
+                        // $comment = 'ARP reply';
+                    }
+                    $len = 42;
+                    break;
+                default:
+                    // Default to internal <-> firewall
+                    if (rand(0,1)) {
+                        $src = rand_ip(true);
+                        $dst = '10.30.0.1';
+                        // $comment = 'Internal to firewall';
+                    } else {
+                        $src = '10.30.0.1';
+                        $dst = rand_ip(true);
+                        // $comment = 'Firewall to internal';
+                    }
+                    break;
+            }
+            // Broadcast/multicast: mDNS, SSDP, DHCP, NetBIOS, etc.
+            if (rand(1,100) <= 10) {
+                $src = rand_ip(true);
+                $dst = '224.0.0.251';
+                $info = 'mDNS query';
+                $rows[] = [$line++, inc_time($base_time, $micros), $src, $dst, 'UDP', 90, $info];
+            }
+            if (rand(1,100) <= 10) {
+                $src = rand_ip(true);
+                $dst = '239.255.255.250';
+                $info = 'SSDP discovery';
+                $rows[] = [$line++, inc_time($base_time, $micros), $src, $dst, 'UDP', 90, $info];
+            }
+            if (rand(1,100) <= 5) {
+                $src = rand_ip(true);
+                $dst = '255.255.255.255';
+                $info = 'NetBIOS Name Query';
+                $rows[] = [$line++, inc_time($base_time, $micros), $src, $dst, 'UDP', 90, $info];
+            }
+        }
+        if ($src && $dst) {
+            $rows[] = [$line++, inc_time($base_time, $micros), $src, $dst, $proto, $len, $info];
+        }
     }
-    $rows[] = [$line++, inc_time($base_time, $micros), $src, $dst, $proto, $len, $info];
 }
 
 // Output all rows
