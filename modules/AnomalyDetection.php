@@ -7,6 +7,43 @@ if (!isset($packets) || !is_array($packets) || count($packets) === 0) {
     return;
 }
 
+// --- Normalize packet keys to expected names regardless of CSV header order or naming ---
+function normalize_packet_keys($packets) {
+    // Map possible header variants to canonical keys
+    $keymap = [
+        'Source' => ['Source', 'Src', 'src'],
+        'Destination' => ['Destination', 'Dst', 'Dest', 'destination'],
+        'Protocol' => ['Protocol', 'Proto', 'protocol'],
+        'Length' => ['Length', 'len', 'length'],
+        'Info' => ['Info', 'info', 'Description', 'description'],
+        'Source Port' => ['Source Port', 'Src port', 'Src Port', 'src port', 'src_port', 'SrcPort', 'Source port'],
+        'Destination Port' => ['Destination Port', 'Dest port', 'Dst port', 'Dest Port', 'dst port', 'dest_port', 'DstPort', 'Destination port'],
+        'Time' => ['Time', 'Timestamp', 'time', 'timestamp'],
+        'No.' => ['No.', 'No', 'no', '#'],
+    ];
+    $normalized = [];
+    foreach ($packets as $pkt) {
+        $newpkt = [];
+        foreach ($keymap as $canon => $aliases) {
+            foreach ($aliases as $alias) {
+                if (array_key_exists($alias, $pkt)) {
+                    $newpkt[$canon] = $pkt[$alias];
+                    break;
+                }
+            }
+        }
+        // Add any other keys as-is
+        foreach ($pkt as $k => $v) {
+            if (!isset($newpkt[$k]) && !in_array($k, array_keys($keymap))) {
+                $newpkt[$k] = $v;
+            }
+        }
+        $normalized[] = $newpkt;
+    }
+    return $normalized;
+}
+
+$packets = normalize_packet_keys($packets);
 
 // --- Modular anomaly detection functions ---
 function detect_port_scans($packets) {
@@ -158,43 +195,55 @@ $reasonCounts = array_count_values($reasons);
 
 // --- Dropdown filter and Pie Chart ---
 ?>
-<div class="mb-3 d-flex flex-wrap align-items-end gap-3">
-  <div>
-    <label for="anomalyReasonFilter" class="form-label mb-1">Filter by Anomaly Type:</label>
-    <select id="anomalyReasonFilter" class="form-select form-select-sm">
-      <option value="">All</option>
-      <?php foreach ($uniqueReasons as $reason): ?>
-        <option value="<?= htmlspecialchars($reason) ?>"><?= htmlspecialchars($reason) ?></option>
-      <?php endforeach; ?>
-    </select>
-  </div>
-  <div>
-    <canvas id="anomalyPieChart" width="240" height="240"></canvas>
-  </div>
+
+<!-- Filter on top -->
+<div class="mb-3">
+  <label for="anomalyReasonFilter" class="form-label mb-1">Filter by Anomaly Type:</label>
+  <select id="anomalyReasonFilter" class="form-select form-select-sm" style="max-width: 300px; display: inline-block;">
+    <option value="">All</option>
+    <?php foreach ($uniqueReasons as $reason): ?>
+      <option value="<?= htmlspecialchars($reason) ?>"><?= htmlspecialchars($reason) ?></option>
+    <?php endforeach; ?>
+  </select>
 </div>
 
-<div class="table-responsive mb-3">
-  <table id="anomalyTable" class="table table-dark table-bordered table-sm small">
-    <thead>
-      <tr><th>Reason</th><?php
-        if (!empty($anomalies[0]['Packet'])) {
-            foreach (array_keys($anomalies[0]['Packet']) as $col) {
-                echo '<th>' . htmlspecialchars($col) . '</th>';
-            }
-        }
-      ?></tr>
-    </thead>
-    <tbody>
-      <?php foreach ($anomalies as $anom): ?>
-        <tr data-reason="<?= htmlspecialchars($anom['Reason']) ?>">
-          <td><?= htmlspecialchars($anom['Reason']) ?></td>
-          <?php foreach ($anom['Packet'] as $val): ?>
-            <td><?= htmlspecialchars($val) ?></td>
-          <?php endforeach; ?>
-        </tr>
-      <?php endforeach; ?>
-    </tbody>
-  </table>
+
+<!-- Pie chart and table side by side in a card with p-4 padding -->
+
+<div class="card mb-3" style="height:100%; min-height:0;">
+  <div class="card-body p-4">
+    <div class="d-flex flex-row flex-wrap gap-4 align-items-start" style="height:100%; min-height:0;">
+      <div style="min-width:180px;max-width:200px;display:flex;flex-direction:column;align-items:center;">
+        <canvas id="anomalyPieChart" width="180" height="180"></canvas>
+        <div id="anomalyPieLegend" style="width:100%;margin-top:8px;"></div>
+      </div>
+      <div style="flex:1 1 0;min-width:320px;min-height:0;">
+        <div class="table-responsive" style="max-height:400px;overflow-y:auto;min-height:0;">
+          <table id="anomalyTable" class="table table-dark table-bordered table-sm small mb-0">
+            <thead>
+              <tr><th>Reason</th><?php
+                if (!empty($anomalies[0]['Packet'])) {
+                    foreach (array_keys($anomalies[0]['Packet']) as $col) {
+                        echo '<th>' . htmlspecialchars($col) . '</th>';
+                    }
+                }
+              ?></tr>
+            </thead>
+            <tbody>
+              <?php foreach ($anomalies as $anom): ?>
+                <tr data-reason="<?= htmlspecialchars($anom['Reason']) ?>">
+                  <td><?= htmlspecialchars($anom['Reason']) ?></td>
+                  <?php foreach ($anom['Packet'] as $val): ?>
+                    <td><?= htmlspecialchars($val) ?></td>
+                  <?php endforeach; ?>
+                </tr>
+              <?php endforeach; ?>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script>
@@ -209,15 +258,22 @@ const pieData = {
   }]
 };
 const ctx = document.getElementById('anomalyPieChart').getContext('2d');
-new Chart(ctx, {
+const anomalyPieChart = new Chart(ctx, {
   type: 'pie',
   data: pieData,
   options: {
-    plugins: { legend: { position: 'left', align: 'start', labels: { boxWidth: 18, padding: 18 } } },
+    plugins: { legend: { position: 'bottom', align: 'center', labels: { boxWidth: 14, padding: 10 } } },
     responsive: false,
     maintainAspectRatio: false
   }
 });
+// Move legend to custom div below chart
+setTimeout(() => {
+  const legend = anomalyPieChart.generateLegend ? anomalyPieChart.generateLegend() : '';
+  if (legend) {
+    document.getElementById('anomalyPieLegend').innerHTML = legend;
+  }
+}, 100);
 
 // Dropdown filter
 document.getElementById('anomalyReasonFilter').addEventListener('change', function() {

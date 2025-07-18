@@ -327,12 +327,12 @@ while (count($rows) < $total_lines) {
 
 
 // Only inject anomalies if requested
+
 $addAnomalies = isset($_GET['anomalies']) && $_GET['anomalies'] == '1';
 if ($addAnomalies) {
     $anomaly_rows = [];
-    $anomaly_line = 10000; // Use high line numbers to avoid collision
-    $base_demo_time = strtotime('2025-07-14 21:00:00');
-    $demo_micros = 123456;
+    $insert_positions = [];
+    $total_rows = count($rows);
 
     // 1. Port scan: same source, many unique destination ports (to trigger detection)
     $scan_src = '10.30.0.99';
@@ -341,15 +341,15 @@ if ($addAnomalies) {
     for ($i = 0; $i < $num_portscan; $i++) {
         $dst_port = 1000 + $i;
         $anomaly_rows[] = [
-            $anomaly_line++,
-            date('Y-m-d H:i:s', $base_demo_time) . ',' . str_pad($demo_micros, 6, '0', STR_PAD_LEFT),
+            null, // Line number will be set later
+            null, // Time will be set later
             $scan_src,
             $src_port,
             '10.30.0.1',
             $dst_port,
             'TCP',
             60,
-            "$scan_src:$src_port > 10.30.0.1:$dst_port [SYN] Seq=0 Win=65535 Len=0 (Port scan anomaly: scan to port $dst_port)"
+            "$scan_src:$src_port > 10.30.0.1:$dst_port [SYN] Seq=0 Win=65535 Len=0"
         ];
     }
 
@@ -359,8 +359,8 @@ if ($addAnomalies) {
     for ($i = 0; $i < $num_rare; $i++) {
         $proto = $rare_protocols[array_rand($rare_protocols)];
         $anomaly_rows[] = [
-            $anomaly_line++,
-            date('Y-m-d H:i:s', $base_demo_time+1+$i) . ',' . str_pad($demo_micros+1+$i, 6, '0', STR_PAD_LEFT),
+            null,
+            null,
             '10.30.0.10',
             0,
             '10.30.0.1',
@@ -375,8 +375,8 @@ if ($addAnomalies) {
     $num_large = rand(2, 5);
     for ($i = 0; $i < $num_large; $i++) {
         $anomaly_rows[] = [
-            $anomaly_line++,
-            date('Y-m-d H:i:s', $base_demo_time+10+$i) . ',' . str_pad($demo_micros+10+$i, 6, '0', STR_PAD_LEFT),
+            null,
+            null,
             '10.30.0.11',
             40001,
             '142.250.190.78',
@@ -389,18 +389,18 @@ if ($addAnomalies) {
 
     // 4. High-frequency: many packets at the same timestamp
     $num_highfreq = rand(2, 5);
-    $freq_time = date('Y-m-d H:i:s', $base_demo_time+20) . ',999999';
+    $freq_time = null; // Will be set later
     for ($i = 0; $i < 51 + $num_highfreq; $i++) { // >50 for detection
         $anomaly_rows[] = [
-            $anomaly_line++,
-            $freq_time,
+            null,
+            null,
             '10.30.0.12',
             50000,
             '142.250.190.206',
             53,
             'UDP',
             120,
-            'Burst traffic demo'
+            'Burst traffic'
         ];
     }
 
@@ -410,15 +410,15 @@ if ($addAnomalies) {
     for ($i = 0; $i < $num_blacklisted; $i++) {
         $ip = $blacklisted_ips[$i % count($blacklisted_ips)];
         $anomaly_rows[] = [
-            $anomaly_line++,
-            date('Y-m-d H:i:s', $base_demo_time+30+$i) . ',' . str_pad($demo_micros+30+$i, 6, '0', STR_PAD_LEFT),
+            null,
+            null,
             $ip,
             6666,
             '10.30.0.13',
             80,
             'TCP',
             100,
-            'Connection from blacklisted IP'
+            'TCP connection attempt'
         ];
     }
 
@@ -426,14 +426,14 @@ if ($addAnomalies) {
     $num_malformed = rand(2, 5);
     for ($i = 0; $i < $num_malformed; $i++) {
         $fields = [
-            ['', 0, '10.30.0.14', 80, 'TCP', 100, 'Malformed: missing source'],
-            ['10.30.0.15', 80, '', 0, 'TCP', 100, 'Malformed: missing destination'],
-            ['10.30.0.16', 80, '10.30.0.17', 80, '', 100, 'Malformed: missing protocol'],
+            ['', 0, '10.30.0.14', 80, 'TCP', 100, ''],
+            ['10.30.0.15', 80, '', 0, 'TCP', 100, ''],
+            ['10.30.0.16', 80, '10.30.0.17', 80, '', 100, ''],
         ];
         $f = $fields[$i % count($fields)];
         $anomaly_rows[] = [
-            $anomaly_line++,
-            date('Y-m-d H:i:s', $base_demo_time+40+$i) . ',' . str_pad($demo_micros+40+$i, 6, '0', STR_PAD_LEFT),
+            null,
+            null,
             $f[0],
             $f[1],
             $f[2],
@@ -444,8 +444,18 @@ if ($addAnomalies) {
         ];
     }
 
-    // Insert anomaly rows at the start so they're always present
-    $rows = array_merge($anomaly_rows, $rows);
+    // Randomly insert anomaly packets into the main rows array
+    shuffle($anomaly_rows);
+    foreach ($anomaly_rows as $anomaly) {
+        // Pick a random position in the rows array
+        $pos = rand(0, count($rows));
+        // Set line number and time to match the position
+        $line_num = $pos < count($rows) ? $rows[$pos][0] : ($rows[count($rows)-1][0] + 1);
+        $time_val = $pos < count($rows) ? $rows[$pos][1] : $rows[count($rows)-1][1];
+        $anomaly[0] = $line_num;
+        $anomaly[1] = $time_val;
+        array_splice($rows, $pos, 0, [ $anomaly ]);
+    }
 }
 
 // Output all rows
