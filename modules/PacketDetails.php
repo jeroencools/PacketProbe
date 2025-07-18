@@ -76,7 +76,11 @@ foreach ($unique as $key => $vals) {
             <?php foreach ($packets as $row): ?>
                 <tr>
                     <?php foreach ($headers as $header): ?>
-                        <td><?php echo htmlspecialchars($row[$header]); ?></td>
+                        <?php if (strtolower($header) === 'protocol'): ?>
+                            <td><span class="protocol-link" data-proto="<?php echo htmlspecialchars($row[$header]); ?>"><?php echo htmlspecialchars($row[$header]); ?></span></td>
+                        <?php else: ?>
+                            <td><?php echo htmlspecialchars($row[$header]); ?></td>
+                        <?php endif; ?>
                     <?php endforeach; ?>
                 </tr>
             <?php endforeach; ?>
@@ -124,3 +128,23 @@ document.addEventListener('DOMContentLoaded', function() {
     selects.forEach(sel => sel.addEventListener('change', filterTable));
 });
 </script>
+<style>
+  .protocol-link {
+    color: #4ea1f7;
+    text-decoration: underline;
+    cursor: pointer;
+    font-weight: 500;
+    transition: color 0.15s;
+  }
+  .protocol-link:hover {
+    color: #1d72b8;
+    text-decoration: underline;
+  }
+</style>
+<!-- Protocol explanation modal (required for clickable protocol links) -->
+<div id="protocol-modal-backdrop" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.75);z-index:9998;"></div>
+<div id="protocol-modal" style="display:none;position:fixed;top:20%;left:50%;transform:translate(-50%,0);background:#222;color:#fff;padding:20px;border-radius:8px;z-index:9999;min-width:300px;">
+  <div id="protocol-modal-content"></div>
+</div>
+<!-- Protocol explanations JS (required for clickable protocol links) -->
+<script src="assets/js/protocols.js"></script>

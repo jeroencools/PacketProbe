@@ -257,7 +257,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 filteredPackets.forEach(function(pkt) {
                     html += '<tr>';
                     for (var k in pkt) {
-                        html += '<td>' + pkt[k] + '</td>';
+                        if (k.toLowerCase() === 'protocol') {
+                            html += '<td><span class="protocol-link" data-proto="' + pkt[k] + '">' + pkt[k] + '</span></td>';
+                        } else {
+                            html += '<td>' + pkt[k] + '</td>';
+                        }
                     }
                     html += '</tr>';
                 });
@@ -307,3 +311,24 @@ document.addEventListener('DOMContentLoaded', function() {
 <?php else: ?>
 <div class="text-secondary mt-2">No network topology data found.</div>
 <?php endif; ?>
+</script>
+<style>
+  .protocol-link {
+    color: #4ea1f7;
+    text-decoration: underline;
+    cursor: pointer;
+    font-weight: 500;
+    transition: color 0.15s;
+  }
+  .protocol-link:hover {
+    color: #1d72b8;
+    text-decoration: underline;
+  }
+</style>
+<!-- Protocol explanation modal (required for clickable protocol links) -->
+<div id="protocol-modal-backdrop" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.75);z-index:9998;"></div>
+<div id="protocol-modal" style="display:none;position:fixed;top:20%;left:50%;transform:translate(-50%,0);background:#222;color:#fff;padding:20px;border-radius:8px;z-index:9999;min-width:300px;">
+  <div id="protocol-modal-content"></div>
+</div>
+<!-- Protocol explanations JS (required for clickable protocol links) -->
+<script src="assets/js/protocols.js"></script>
