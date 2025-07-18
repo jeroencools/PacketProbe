@@ -17,7 +17,16 @@
             </div>
             <button type="submit" class="btn btn-primary w-100">Upload</button>
         </form>
-        <a href="randomcsv.php" class="btn btn-outline-secondary mt-3 w-100" style="max-width:400px;">Create a random CSV</a>
+        <form action="randomcsv.php" method="get" class="w-100 mt-3" style="max-width:400px;">
+            <input type="hidden" name="download" value="1">
+            <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" value="1" id="addAnomalies" name="anomalies">
+                <label class="form-check-label" for="addAnomalies">
+                    Add demo anomalies to generated CSV
+                </label>
+            </div>
+            <button type="submit" class="btn btn-outline-secondary w-100">Create a random CSV</button>
+        </form>
     </div>
 </body>
 </html>

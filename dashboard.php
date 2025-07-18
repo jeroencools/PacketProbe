@@ -144,7 +144,8 @@ $modules = [
     'protocolpie' => 'Protocol Pie Chart',
     'toptalkers' => 'Top Talkers',
     'conversationmatrix' => 'Conversation Matrix',
-    'networktopology' => 'Network Topology', // <-- Added new module
+    'networktopology' => 'Network Topology',
+    'anomalydetection' => 'Anomaly Detection',
     'option1' => 'Option 1',
     'option2' => 'Option 2',
     'option3' => 'Option 3',
@@ -268,6 +269,9 @@ $totalCards = 6;
                             } elseif ($selectedModules[$i] === 'networktopology') {
                                 $packets = $originalPackets;
                                 include __DIR__ . '/modules/NetworkTopology.php';
+                            } elseif ($selectedModules[$i] === 'anomalydetection') {
+                                $packets = $originalPackets;
+                                include __DIR__ . '/modules/AnomalyDetection.php';
                             } else {
                                 echo '<div class="text-secondary">Placeholder for ' . htmlspecialchars($modules[$selectedModules[$i]]) . '</div>';
                             }

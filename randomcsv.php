@@ -4,7 +4,7 @@ header('Content-Disposition: attachment; filename="example.csv"');
 
 // Column headers
 
-$headers = ['No.','Time','Source','Destination','Protocol','Length','Info'];
+$headers = ['No.','Time','Source','Source Port','Destination','Destination Port','Protocol','Length','Info'];
 echo '"' . implode('","', $headers) . '"' . "\r\n";
 
 // Helper functions
@@ -93,13 +93,13 @@ for ($c = 2; $c <= 6; $c++) {
     $server = "10.30.0.1";
     $yiaddr = "10.30.0." . (100+$c);
     // Discover (broadcast)
-    $rows[] = [$line++, inc_time($base_time, $micros), $client, '255.255.255.255', 'DHCP', 342, "DHCP Discover from $client"];
+    $rows[] = [$line++, inc_time($base_time, $micros), $client, 68, '255.255.255.255', 67, 'DHCP', 342, "DHCP Discover from $client"];
     // Offer (server to client)
-    $rows[] = [$line++, inc_time($base_time, $micros), $server, $client, 'DHCP', 342, "DHCP Offer to $client yiaddr=$yiaddr"];
+    $rows[] = [$line++, inc_time($base_time, $micros), $server, 67, $client, 68, 'DHCP', 342, "DHCP Offer to $client yiaddr=$yiaddr"];
     // Request (broadcast)
-    $rows[] = [$line++, inc_time($base_time, $micros), $client, '255.255.255.255', 'DHCP', 342, "DHCP Request from $client for $yiaddr"];
+    $rows[] = [$line++, inc_time($base_time, $micros), $client, 68, '255.255.255.255', 67, 'DHCP', 342, "DHCP Request from $client for $yiaddr"];
     // ACK (server to client)
-    $rows[] = [$line++, inc_time($base_time, $micros), $server, $client, 'DHCP', 342, "DHCP ACK to $client yiaddr=$yiaddr"];
+    $rows[] = [$line++, inc_time($base_time, $micros), $server, 67, $client, 68, 'DHCP', 342, "DHCP ACK to $client yiaddr=$yiaddr"];
 }
 
 // 2. DNS queries/responses for 5 clients
@@ -108,8 +108,8 @@ foreach (range(2, 6) as $c) {
     $server = "10.30.0.1";
     $domain = $dns_domains[array_rand($dns_domains)];
     $query_id = dechex(rand(1000,9999));
-    $rows[] = [$line++, inc_time($base_time, $micros), $client, $server, 'DNS', 74, "Standard query 0x$query_id A $domain"];
-    $rows[] = [$line++, inc_time($base_time, $micros), $server, $client, 'DNS', 90, "Standard query response 0x$query_id A $domain A " . rand_ip(false)];
+    $rows[] = [$line++, inc_time($base_time, $micros), $client, 12345, $server, 53, 'DNS', 74, "Standard query 0x$query_id A $domain"];
+    $rows[] = [$line++, inc_time($base_time, $micros), $server, 53, $client, 12345, 'DNS', 90, "Standard query response 0x$query_id A $domain A " . rand_ip(false)];
 }
 
 // 3. TCP 3-way handshake and HTTP request/response
@@ -117,11 +117,11 @@ $client = "10.30.0.10";
 $server = rand_ip(false);
 $client_port = rand(40000, 60000);
 $server_port = 80;
-$rows[] = [$line++, inc_time($base_time, $micros), $client, $server, 'TCP', 66, "$client_port  >  $server_port [SYN] Seq=0 Win=65535 Len=0 MSS=1460"];
-$rows[] = [$line++, inc_time($base_time, $micros), $server, $client, 'TCP', 66, "$server_port  >  $client_port [SYN, ACK] Seq=0 Ack=1 Win=65535 Len=0 MSS=1420"];
-$rows[] = [$line++, inc_time($base_time, $micros), $client, $server, 'TCP', 54, "$client_port  >  $server_port [ACK] Seq=1 Ack=1 Win=65280 Len=0"];
-$rows[] = [$line++, inc_time($base_time, $micros), $client, $server, 'HTTP', 512, "GET /index.html HTTP/1.1 Host: " . $dns_domains[array_rand($dns_domains)]];
-$rows[] = [$line++, inc_time($base_time, $micros), $server, $client, 'HTTP', 1024, "HTTP/1.1 200 OK Content-Type: text/html"];
+$rows[] = [$line++, inc_time($base_time, $micros), $client, $client_port, $server, $server_port, 'TCP', 66, "$client_port  >  $server_port [SYN] Seq=0 Win=65535 Len=0 MSS=1460"];
+$rows[] = [$line++, inc_time($base_time, $micros), $server, $server_port, $client, $client_port, 'TCP', 66, "$server_port  >  $client_port [SYN, ACK] Seq=0 Ack=1 Win=65535 Len=0 MSS=1420"];
+$rows[] = [$line++, inc_time($base_time, $micros), $client, $client_port, $server, $server_port, 'TCP', 54, "$client_port  >  $server_port [ACK] Seq=1 Ack=1 Win=65280 Len=0"];
+$rows[] = [$line++, inc_time($base_time, $micros), $client, $client_port, $server, $server_port, 'HTTP', 512, "GET /index.html HTTP/1.1 Host: " . $dns_domains[array_rand($dns_domains)]];
+$rows[] = [$line++, inc_time($base_time, $micros), $server, $server_port, $client, $client_port, 'HTTP', 1024, "HTTP/1.1 200 OK Content-Type: text/html"];
 
 // 4. UDP traffic (DNS, NTP, mDNS, SSDP)
 foreach ($udp_services as $svc) {
@@ -130,30 +130,31 @@ foreach ($udp_services as $svc) {
     if ($svc['desc'] === 'DNS') {
         $dst = "10.30.0.1";
     }
-    $rows[] = [$line++, inc_time($base_time, $micros), $src, $dst, 'UDP', rand(60,120), $svc['desc'] . " traffic $src > $dst port " . $svc['port']];
+    $rows[] = [$line++, inc_time($base_time, $micros), $src, rand(1024,65535), $dst, $svc['port'], 'UDP', rand(60,120), $svc['desc'] . " traffic $src > $dst port " . $svc['port']];
 }
 
 // 5. ICMP echo request/reply
 $src = rand_ip(true);
 $dst = rand_ip(false);
-$rows[] = [$line++, inc_time($base_time, $micros), $src, $dst, 'ICMP', 98, "Echo (ping) request id=" . rand(1000,9999) . " seq=1"];
-$rows[] = [$line++, inc_time($base_time, $micros), $dst, $src, 'ICMP', 98, "Echo (ping) reply id=" . rand(1000,9999) . " seq=1"];
+$rows[] = [$line++, inc_time($base_time, $micros), $src, 0, $dst, 0, 'ICMP', 98, "Echo (ping) request id=" . rand(1000,9999) . " seq=1"];
+$rows[] = [$line++, inc_time($base_time, $micros), $dst, 0, $src, 0, 'ICMP', 98, "Echo (ping) reply id=" . rand(1000,9999) . " seq=1"];
 
 // 6. ARP request/reply
 $src = rand_ip(true);
 $dst = rand_ip(true);
-$rows[] = [$line++, inc_time($base_time, $micros), $src, $dst, 'ARP', 42, "Who has $dst? Tell $src"];
-$rows[] = [$line++, inc_time($base_time, $micros), $dst, $src, 'ARP', 42, "Reply $dst is-at " . rand_mac()];
+$rows[] = [$line++, inc_time($base_time, $micros), $src, 0, $dst, 0, 'ARP', 42, "Who has $dst? Tell $src"];
+$rows[] = [$line++, inc_time($base_time, $micros), $dst, 0, $src, 0, 'ARP', 42, "Reply $dst is-at " . rand_mac()];
 
 // 7. TLS handshake/application data
 $client = "10.30.0.20";
 $server = rand_ip(false);
-$rows[] = [$line++, inc_time($base_time, $micros), $client, $server, 'TCP', 66, rand(40000,60000) . "  >  443 [SYN] Seq=0 Win=65535 Len=0 MSS=1460"];
-$rows[] = [$line++, inc_time($base_time, $micros), $server, $client, 'TCP', 66, "443  >  " . rand(40000,60000) . " [SYN, ACK] Seq=0 Ack=1 Win=65535 Len=0 MSS=1420"];
-$rows[] = [$line++, inc_time($base_time, $micros), $client, $server, 'TCP', 54, rand(40000,60000) . "  >  443 [ACK] Seq=1 Ack=1 Win=65280 Len=0"];
-$rows[] = [$line++, inc_time($base_time, $micros), $client, $server, 'TLSv1.3', 571, "Client Hello (SNI=" . $dns_domains[array_rand($dns_domains)] . ")"];
-$rows[] = [$line++, inc_time($base_time, $micros), $server, $client, 'TLSv1.3', 2894, "Server Hello, Change Cipher Spec, Application Data"];
-$rows[] = [$line++, inc_time($base_time, $micros), $server, $client, 'TLSv1.3', 709, "Application Data, Application Data, Application Data"];
+$tcp_client_port = rand(40000,60000);
+$rows[] = [$line++, inc_time($base_time, $micros), $client, $tcp_client_port, $server, 443, 'TCP', 66, "$tcp_client_port  >  443 [SYN] Seq=0 Win=65535 Len=0 MSS=1460"];
+$rows[] = [$line++, inc_time($base_time, $micros), $server, 443, $client, $tcp_client_port, 'TCP', 66, "443  >  $tcp_client_port [SYN, ACK] Seq=0 Ack=1 Win=65535 Len=0 MSS=1420"];
+$rows[] = [$line++, inc_time($base_time, $micros), $client, $tcp_client_port, $server, 443, 'TCP', 54, "$tcp_client_port  >  443 [ACK] Seq=1 Ack=1 Win=65280 Len=0"];
+$rows[] = [$line++, inc_time($base_time, $micros), $client, $tcp_client_port, $server, 443, 'TLSv1.3', 571, "Client Hello (SNI=" . $dns_domains[array_rand($dns_domains)] . ")"];
+$rows[] = [$line++, inc_time($base_time, $micros), $server, 443, $client, $tcp_client_port, 'TLSv1.3', 2894, "Server Hello, Change Cipher Spec, Application Data"];
+$rows[] = [$line++, inc_time($base_time, $micros), $server, 443, $client, $tcp_client_port, 'TLSv1.3', 709, "Application Data, Application Data, Application Data"];
 
 // 8. Add more mixed traffic to reach 250 lines
 function is_internal($ip) {
@@ -166,7 +167,7 @@ function is_external($ip) {
     return !is_internal($ip) && !is_firewall($ip);
 }
 // 350 lines, with bursts and more realism
-$total_lines = 350;
+$total_lines = 500;
 $burst_size = 10;
 $burst_probability = 20; // percent
 while (count($rows) < $total_lines) {
@@ -316,9 +317,135 @@ while (count($rows) < $total_lines) {
             }
         }
         if ($src && $dst) {
-            $rows[] = [$line++, inc_time($base_time, $micros), $src, $dst, $proto, $len, $info];
+            $src_port = in_array($proto, ['TCP','UDP']) ? rand(1024,65535) : 0;
+            $dst_port = in_array($proto, ['TCP','UDP']) ? rand(1,65535) : 0;
+            $rows[] = [$line++, inc_time($base_time, $micros), $src, $src_port, $dst, $dst_port, $proto, $len, $info];
         }
     }
+}
+
+
+
+// Only inject anomalies if requested
+$addAnomalies = isset($_GET['anomalies']) && $_GET['anomalies'] == '1';
+if ($addAnomalies) {
+    $anomaly_rows = [];
+    $anomaly_line = 10000; // Use high line numbers to avoid collision
+    $base_demo_time = strtotime('2025-07-14 21:00:00');
+    $demo_micros = 123456;
+
+    // 1. Port scan: same source, many unique destination ports (to trigger detection)
+    $scan_src = '10.30.0.99';
+    $num_portscan = rand(2, 5);
+    $src_port = 40000;
+    for ($i = 0; $i < $num_portscan; $i++) {
+        $dst_port = 1000 + $i;
+        $anomaly_rows[] = [
+            $anomaly_line++,
+            date('Y-m-d H:i:s', $base_demo_time) . ',' . str_pad($demo_micros, 6, '0', STR_PAD_LEFT),
+            $scan_src,
+            $src_port,
+            '10.30.0.1',
+            $dst_port,
+            'TCP',
+            60,
+            "$scan_src:$src_port > 10.30.0.1:$dst_port [SYN] Seq=0 Win=65535 Len=0 (Port scan anomaly: scan to port $dst_port)"
+        ];
+    }
+
+    // 2. Rare protocol: one-off protocol (random protocol name)
+    $num_rare = rand(2, 5);
+    $rare_protocols = ['GOPHER', 'XNS', 'DECNET', 'IPX', 'NETBIOS'];
+    for ($i = 0; $i < $num_rare; $i++) {
+        $proto = $rare_protocols[array_rand($rare_protocols)];
+        $anomaly_rows[] = [
+            $anomaly_line++,
+            date('Y-m-d H:i:s', $base_demo_time+1+$i) . ',' . str_pad($demo_micros+1+$i, 6, '0', STR_PAD_LEFT),
+            '10.30.0.10',
+            0,
+            '10.30.0.1',
+            0,
+            $proto,
+            100,
+            "$proto request"
+        ];
+    }
+
+    // 3. Unusually large packet
+    $num_large = rand(2, 5);
+    for ($i = 0; $i < $num_large; $i++) {
+        $anomaly_rows[] = [
+            $anomaly_line++,
+            date('Y-m-d H:i:s', $base_demo_time+10+$i) . ',' . str_pad($demo_micros+10+$i, 6, '0', STR_PAD_LEFT),
+            '10.30.0.11',
+            40001,
+            '142.250.190.78',
+            443,
+            'TCP',
+            rand(2000, 10000),
+            'Large file transfer'
+        ];
+    }
+
+    // 4. High-frequency: many packets at the same timestamp
+    $num_highfreq = rand(2, 5);
+    $freq_time = date('Y-m-d H:i:s', $base_demo_time+20) . ',999999';
+    for ($i = 0; $i < 51 + $num_highfreq; $i++) { // >50 for detection
+        $anomaly_rows[] = [
+            $anomaly_line++,
+            $freq_time,
+            '10.30.0.12',
+            50000,
+            '142.250.190.206',
+            53,
+            'UDP',
+            120,
+            'Burst traffic demo'
+        ];
+    }
+
+    // 5. Blacklisted IP (use one from blacklist.php)
+    $num_blacklisted = rand(2, 5);
+    $blacklisted_ips = ['198.2.175.226', '185.60.170.211', '8.216.34.160', '188.166.225.158', '185.238.231.177'];
+    for ($i = 0; $i < $num_blacklisted; $i++) {
+        $ip = $blacklisted_ips[$i % count($blacklisted_ips)];
+        $anomaly_rows[] = [
+            $anomaly_line++,
+            date('Y-m-d H:i:s', $base_demo_time+30+$i) . ',' . str_pad($demo_micros+30+$i, 6, '0', STR_PAD_LEFT),
+            $ip,
+            6666,
+            '10.30.0.13',
+            80,
+            'TCP',
+            100,
+            'Connection from blacklisted IP'
+        ];
+    }
+
+    // 6. Malformed packet (missing key fields)
+    $num_malformed = rand(2, 5);
+    for ($i = 0; $i < $num_malformed; $i++) {
+        $fields = [
+            ['', 0, '10.30.0.14', 80, 'TCP', 100, 'Malformed: missing source'],
+            ['10.30.0.15', 80, '', 0, 'TCP', 100, 'Malformed: missing destination'],
+            ['10.30.0.16', 80, '10.30.0.17', 80, '', 100, 'Malformed: missing protocol'],
+        ];
+        $f = $fields[$i % count($fields)];
+        $anomaly_rows[] = [
+            $anomaly_line++,
+            date('Y-m-d H:i:s', $base_demo_time+40+$i) . ',' . str_pad($demo_micros+40+$i, 6, '0', STR_PAD_LEFT),
+            $f[0],
+            $f[1],
+            $f[2],
+            $f[3],
+            $f[4],
+            $f[5],
+            $f[6]
+        ];
+    }
+
+    // Insert anomaly rows at the start so they're always present
+    $rows = array_merge($anomaly_rows, $rows);
 }
 
 // Output all rows
