@@ -27,6 +27,13 @@
             </div>
             <button type="submit" class="btn btn-outline-secondary w-100">Create a random CSV</button>
         </form>
+<div style="width: 100%; text-align: center; margin-top: 48px; margin-bottom: 16px;">
+    <a href="https://jeroenict.be" target="_blank" rel="noopener">
+        <img src="assets/img/logo-transp-green.png" alt="Jeroen ICT Logo" style="height: 48px; opacity: 0.85; transition: opacity 0.2s; border-radius: 0.5rem;">
+    </a>
+</div>
     </div>
+
+
 </body>
 </html>

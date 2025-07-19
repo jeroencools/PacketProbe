@@ -191,7 +191,14 @@ $totalCards = 6;
 </head>
 <body class="bg-dark text-light vh-100">
     <div class="container-fluid h-100 py-4">
-        <h1 class="mb-2 text-center">PacketProbe - Dashboard</h1>
+        
+<h1 class="mb-2 text-center d-flex justify-content-center align-items-center gap-3" style="gap: 1rem;">
+    <a href="https://jeroenict.be" target="_blank" rel="noopener">
+        <img src="assets/img/logo-transp-green.png" alt="Jeroen ICT Logo" style="height: 44px; border-radius: 0.5rem; opacity: 0.85;">
+    </a>
+    <span>PacketProbe - Dashboard</span>
+</h1>
+        
         <div class="d-flex justify-content-center mb-3">
             <form method="post" class="d-flex align-items-center" id="layout-form" style="font-size: 0.95rem;">
                 <!-- Back button to upload page -->
