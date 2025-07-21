@@ -219,22 +219,29 @@ $reasonCounts = array_count_values($reasons);
       </div>
       <div style="flex:1 1 0;min-width:320px;min-height:0;">
         <div class="table-responsive" style="max-height:100%;overflow-y:auto;min-height:0;">
-          <table id="anomalyTable" class="table table-dark table-bordered table-sm small mb-0">
+          <table id="anomalyTable" class="table table-dark table-striped table-bordered table-sm mb-0">
             <thead>
-              <tr><th>Reason</th><?php
-                if (!empty($anomalies[0]['Packet'])) {
-                    foreach (array_keys($anomalies[0]['Packet']) as $col) {
-                        echo '<th>' . htmlspecialchars($col) . '</th>';
-                    }
-                }
-              ?></tr>
+              <tr>
+                <th>Reason</th>
+                <?php
+                  if (!empty($anomalies[0]['Packet'])) {
+                      foreach (array_keys($anomalies[0]['Packet']) as $col) {
+                          echo '<th>' . htmlspecialchars($col) . '</th>';
+                      }
+                  }
+                ?>
+              </tr>
             </thead>
             <tbody>
               <?php foreach ($anomalies as $anom): ?>
                 <tr data-reason="<?= htmlspecialchars($anom['Reason']) ?>">
                   <td><?= htmlspecialchars($anom['Reason']) ?></td>
-                  <?php foreach ($anom['Packet'] as $val): ?>
-                    <td><?= htmlspecialchars($val) ?></td>
+                  <?php foreach ($anom['Packet'] as $col => $val): ?>
+                    <?php if (strtolower($col) === 'protocol'): ?>
+                      <td><span class="protocol-link" data-proto="<?= htmlspecialchars($val) ?>"><?= htmlspecialchars($val) ?></span></td>
+                    <?php else: ?>
+                      <td><?= htmlspecialchars($val) ?></td>
+                    <?php endif; ?>
                   <?php endforeach; ?>
                 </tr>
               <?php endforeach; ?>
