@@ -21,7 +21,7 @@ body {
 
 .col-12, .col-lg-6 {
     min-height: 0 !important;
-    height: 70vh;
+    height: 85vh;
     display: flex;
     align-items: stretch;
 }

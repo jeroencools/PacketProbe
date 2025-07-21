@@ -87,9 +87,7 @@ echo '</script>';
     <div id="<?php echo $detailsId; ?>" class="ms-3 flex-shrink-1" style="width:340px;max-width:340px;max-height:100%;overflow:auto;"></div>
 </div>
 <?php if (!empty($nodes) && !empty($edges)): ?>
-<div class="text-secondary mb-1" style="font-size:0.95em;">
-    Nodes: <?php echo count($nodes); ?>, Edges: <?php echo count($edges); ?>
-</div>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     var container = document.getElementById('<?php echo $cyId; ?>');

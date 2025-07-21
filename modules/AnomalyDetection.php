@@ -218,7 +218,7 @@ $reasonCounts = array_count_values($reasons);
         <div id="anomalyPieLegend" style="width:100%;margin-top:8px;"></div>
       </div>
       <div style="flex:1 1 0;min-width:320px;min-height:0;">
-        <div class="table-responsive" style="max-height:400px;overflow-y:auto;min-height:0;">
+        <div class="table-responsive" style="max-height:100%;overflow-y:auto;min-height:0;">
           <table id="anomalyTable" class="table table-dark table-bordered table-sm small mb-0">
             <thead>
               <tr><th>Reason</th><?php
