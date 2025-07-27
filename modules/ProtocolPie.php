@@ -18,7 +18,7 @@ $labels = array_keys($protocolCounts);
 $data = array_values($protocolCounts);
 $chartId = 'protocolPieChart_' . uniqid();
 ?>
-<div style="flex:1 1 auto; display:flex; flex-direction:column; justify-content:stretch; align-items:stretch; min-height:0; height:100%;">
+<div class="protocol-pie-container" style="flex:1 1 auto; display:flex; flex-direction:column; justify-content:stretch; align-items:stretch; min-height:0; height:100%;">
     <canvas id="<?php echo $chartId; ?>" style="width:100% !important; height:100% !important; flex:1 1 auto; min-height:0;"></canvas>
 </div>
 <?php
@@ -36,7 +36,17 @@ $GLOBALS['chartjs_datalabels_loaded'] = true;
 <script>
 document.addEventListener("DOMContentLoaded", function() {
     var ctx = document.getElementById('<?php echo $chartId; ?>').getContext('2d');
-    new Chart(ctx, {
+    // Detect light/dark mode
+    function isLightMode() {
+        return document.body.classList.contains('light-mode');
+    }
+    function getLegendColor() {
+        return isLightMode() ? '#23272b' : '#f8f9fa';
+    }
+    function getLabelColor() {
+        return isLightMode() ? '#23272b' : '#fff';
+    }
+    var chart = new Chart(ctx, {
         type: 'pie',
         data: {
             labels: <?php echo json_encode($labels); ?>,
@@ -53,10 +63,10 @@ document.addEventListener("DOMContentLoaded", function() {
             responsive: true,
             plugins: {
                 legend: {
-                    labels: { color: '#f8f9fa' }
+                    labels: { color: getLegendColor() }
                 },
                 datalabels: {
-                    color: '#fff',
+                    color: getLabelColor(),
                     font: { weight: 'bold' },
                     formatter: function(value, context) {
                         var sum = context.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
@@ -68,5 +78,26 @@ document.addEventListener("DOMContentLoaded", function() {
         },
         plugins: [ChartDataLabels]
     });
+
+    // Update chart colors on theme change
+    function updateChartColors() {
+        chart.options.plugins.legend.labels.color = getLegendColor();
+        chart.options.plugins.datalabels.color = getLabelColor();
+        chart.update();
+    }
+    // Listen for theme changes
+    var observer = new MutationObserver(updateChartColors);
+    observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
 });
 </script>
+<style>
+/* filepath: c:\Users\Jeroen\OneDrive\ICT\5. Code\Webdev\PacketProbe\modules\ProtocolPie.php */
+.protocol-pie-container {
+    background: transparent;
+    color: #f8f9fa;
+}
+body.light-mode .protocol-pie-container {
+    background: transparent;
+    color: #23272b;
+}
+</style>

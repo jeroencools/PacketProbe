@@ -21,7 +21,7 @@ body {
 
 .col-12, .col-lg-6 {
     min-height: 0 !important;
-    height: 85vh;
+    height: 65vh;
     display: flex;
     align-items: stretch;
 }
@@ -135,6 +135,70 @@ th, td {
     table-layout: fixed;
 }
 
+/* Dark mode (default) scrollbar */
+.table-responsive::-webkit-scrollbar,
+.table-responsive > table::-webkit-scrollbar {
+    width: 8px;
+    background: #23272b;
+}
+.table-responsive::-webkit-scrollbar-thumb,
+.table-responsive > table::-webkit-scrollbar-thumb {
+    background: #343a40;
+    border-radius: 4px;
+}
+
+/* Light mode scrollbar */
+body.light-mode .table-responsive::-webkit-scrollbar,
+body.light-mode .table-responsive > table::-webkit-scrollbar {
+    background: #e9ecef;
+}
+body.light-mode .table-responsive::-webkit-scrollbar-thumb,
+body.light-mode .table-responsive > table::-webkit-scrollbar-thumb {
+    background: #adb5bd;
+    border-radius: 4px;
+}
+
+/* For Firefox */
+.table-responsive,
+.table-responsive > table {
+    scrollbar-color: #343a40 #23272b;
+}
+body.light-mode .table-responsive,
+body.light-mode .table-responsive > table {
+    scrollbar-color: #adb5bd #e9ecef;
+}
+
+/* Remove custom scrollbar for .card.overflow-auto (revert to only table-responsive) */
+.table-responsive,
+.table-responsive > table {
+    scrollbar-width: thin;
+    scrollbar-color: #343a40 #23272b;
+}
+.table-responsive::-webkit-scrollbar,
+.table-responsive > table::-webkit-scrollbar {
+    width: 8px;
+    background: #23272b;
+}
+.table-responsive::-webkit-scrollbar-thumb,
+.table-responsive > table::-webkit-scrollbar-thumb {
+    background: #343a40;
+    border-radius: 4px;
+}
+
+body.light-mode .table-responsive,
+body.light-mode .table-responsive > table {
+    scrollbar-color: #adb5bd #e9ecef;
+}
+body.light-mode .table-responsive::-webkit-scrollbar,
+body.light-mode .table-responsive > table::-webkit-scrollbar {
+    background: #e9ecef;
+}
+body.light-mode .table-responsive::-webkit-scrollbar-thumb,
+body.light-mode .table-responsive > table::-webkit-scrollbar-thumb {
+    background: #adb5bd;
+    border-radius: 4px;
+}
+
 /* Add a wrapper for scrolling if needed */
 .table-responsive::-webkit-scrollbar,
 .table-responsive > table::-webkit-scrollbar {
@@ -147,8 +211,152 @@ th, td {
     border-radius: 4px;
 }
 
+/* Custom scrollbar for .table-responsive and .card.overflow-auto (force on card) */
+.table-responsive,
+.table-responsive > table,
+.card.overflow-auto {
+    scrollbar-width: thin !important;
+    scrollbar-color: #343a40 #23272b !important;
+}
+.table-responsive::-webkit-scrollbar,
+.table-responsive > table::-webkit-scrollbar,
+.card.overflow-auto::-webkit-scrollbar {
+    width: 8px !important;
+    background: #23272b !important;
+}
+.table-responsive::-webkit-scrollbar-thumb,
+.table-responsive > table::-webkit-scrollbar-thumb,
+.card.overflow-auto::-webkit-scrollbar-thumb {
+    background: #343a40 !important;
+    border-radius: 4px !important;
+}
+
+/* Light mode scrollbar for .card as well */
+body.light-mode .table-responsive,
+body.light-mode .table-responsive > table,
+body.light-mode .card.overflow-auto {
+    scrollbar-color: #adb5bd #e9ecef !important;
+}
+body.light-mode .table-responsive::-webkit-scrollbar,
+body.light-mode .table-responsive > table::-webkit-scrollbar,
+body.light-mode .card.overflow-auto::-webkit-scrollbar {
+    background: #e9ecef !important;
+}
+body.light-mode .table-responsive::-webkit-scrollbar-thumb,
+body.light-mode .table-responsive > table::-webkit-scrollbar-thumb,
+body.light-mode .card.overflow-auto::-webkit-scrollbar-thumb {
+    background: #adb5bd !important;
+    border-radius: 4px !important;
+}
+
+/* Add a custom class for dashboard controls to avoid col-12 height rules */
+.dashboard-controls {
+    height: auto !important;
+    min-height: unset !important;
+    max-width: 100%;
+    width: auto;
+    background: #23272b;
+    margin-left: auto;
+    margin-right: auto;
+    justify-content: center !important;
+    align-items: center !important;
+    text-align: center;
+    flex-direction: row !important;
+}
+
+@media (min-width: 768px) {
+    .dashboard-controls {
+        flex-direction: row !important;
+        text-align: left;
+    }
+    .dashboard-controls form {
+        width: auto;
+        justify-content: flex-start !important;
+    }
+    .dashboard-controls > .me-md-3 {
+        margin-bottom: 0 !important;
+    }
+}
+
 @media (max-width: 767.98px) {
     #dashboard-grid .col-12 {
         margin-bottom: 1rem;
     }
+    .dashboard-controls {
+        flex-direction: column !important;
+        align-items: center !important;
+        text-align: center;
+    }
+    .dashboard-controls form {
+        width: 100%;
+        justify-content: center !important;
+    }
+    .dashboard-controls > .me-md-3 {
+        margin-bottom: 0.5rem !important;
+    }
+}
+
+/* Light mode overrides */
+body.light-mode {
+    background-color: #f8f9fa !important;
+    color: #23272b !important;
+}
+body.light-mode .card,
+body.light-mode .dashboard-controls,
+body.light-mode .section-content {
+    background-color: #fff !important;
+    color: #23272b !important;
+    border-color: #dee2e6 !important;
+}
+body.light-mode .form-select,
+body.light-mode .form-select:focus {
+    background-color: #fff !important;
+    color: #23272b !important;
+    border-color: #dee2e6 !important;
+}
+body.light-mode .table-dark {
+    --bs-table-bg: #fff;
+    --bs-table-striped-bg: #f3f3f3;
+    --bs-table-striped-color: #23272b;
+    --bs-table-border-color: #dee2e6;
+    color: #23272b !important;
+}
+body.light-mode .table th,
+body.light-mode .table td {
+    color: #23272b !important;
+    border-bottom: 1px solid #dee2e6;
+}
+body.light-mode .bg-dark {
+    background-color: #fff !important;
+}
+body.light-mode .text-light {
+    color: #23272b !important;
+}
+body.light-mode .text-dark {
+    color: #23272b !important;
+}
+body.light-mode .border-secondary {
+    border-color: #dee2e6 !important;
+}
+body.light-mode .btn-secondary {
+    background-color: #e9ecef !important;
+    color: #23272b !important;
+    border-color: #dee2e6 !important;
+}
+body.light-mode .btn-primary {
+    background-color: #0d6efd !important;
+    color: #fff !important;
+    border-color: #0d6efd !important;
+}
+body.light-mode .badge.bg-success {
+    background-color: #198754 !important;
+    color: #fff !important;
+}
+body.light-mode .badge.bg-warning {
+    background-color: #ffc107 !important;
+    color: #23272b !important;
+}
+body.light-mode .badge.bg-secondary {
+    background-color: #6c757d !important;
+    color: #fff !important;
 }

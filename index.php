@@ -7,7 +7,14 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
-<body>
+<body id="body-root" class="bg-dark text-light">
+    <!-- Dark/Light mode toggle (top left) -->
+    <div style="position: absolute; top: 18px; left: 18px; z-index: 10;">
+        <label class="form-switch d-flex align-items-center gap-2" style="user-select:none;">
+            <input type="checkbox" id="themeToggle" class="form-check-input" style="width:2em;height:1em;">
+            <span id="themeLabel" style="font-size:1rem;">🌙</span>
+        </label>
+    </div>
     <div class="container d-flex flex-column justify-content-center align-items-center min-vh-100">
         <h1 class="mb-4">PacketProbe</h1>
         <form action="map_columns.php" method="post" enctype="multipart/form-data" class="w-100" style="max-width:400px;">
@@ -33,7 +40,36 @@
     </a>
 </div>
     </div>
-
-
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const body = document.getElementById('body-root');
+        const toggle = document.getElementById('themeToggle');
+        const label = document.getElementById('themeLabel');
+        function setTheme(light, persist) {
+            if (light) {
+                body.classList.add('light-mode');
+                label.textContent = '☀️';
+            } else {
+                body.classList.remove('light-mode');
+                label.textContent = '🌙';
+            }
+            if (persist) {
+                document.cookie = "theme=" + (light ? "light" : "dark") + ";path=/;max-age=31536000";
+            }
+        }
+        function getCookie(name) {
+            const v = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
+            return v ? v.pop() : '';
+        }
+        const saved = getCookie('theme') === 'light';
+        setTheme(saved, false);
+        if (toggle) toggle.checked = saved;
+        if (toggle) {
+            toggle.addEventListener('change', function() {
+                setTheme(this.checked, true);
+            });
+        }
+    });
+    </script>
 </body>
 </html>

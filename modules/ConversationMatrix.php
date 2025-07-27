@@ -6,15 +6,21 @@ if (empty($packets) || !is_array($packets)) {
     return;
 }
 
-// $packets is already mapped to expected keys by dashboard.php, so no further mapping or key detection is needed
-
+// Defensive: ensure at least one row and both keys exist
 $headers = array_keys($packets[0]);
+if (!in_array('Source', $headers) || !in_array('Destination', $headers)) {
+    echo '<div class="text-danger">Could not detect Source/Destination columns in mapped data.</div>';
+    return;
+}
+
 $srcCol = 'Source';
 $dstCol = 'Destination';
 
 // Build conversation matrix
 $conversations = [];
 foreach ($packets as $pkt) {
+    // Defensive: skip rows missing keys
+    if (!isset($pkt[$srcCol]) || !isset($pkt[$dstCol])) continue;
     $src = $pkt[$srcCol];
     $dst = $pkt[$dstCol];
     if (!isset($conversations[$src])) $conversations[$src] = [];
@@ -64,27 +70,8 @@ usort($matrixRows, function($a, $b) use ($sortOrder) {
             ?>
         </div>
     </form>
-    <div class="flex-grow-1 overflow-auto">
+    <div class="flex-grow-1 overflow-auto table-responsive">
         <table class="table table-sm table-dark table-bordered align-middle mb-0">
-            <thead>
-                <tr>
-                    <th>Source</th>
-                    <th>Destination</th>
-                    <th class="text-end">Packets</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php foreach ($matrixRows as $row): ?>
-                <tr>
-                    <td><?php echo htmlspecialchars($row['src']); ?></td>
-                    <td><?php echo htmlspecialchars($row['dst']); ?></td>
-                    <td class="text-end"><?php echo $row['count']; ?></td>
-                </tr>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
-    </div>
-</div>
             <thead>
                 <tr>
                     <th>Source</th>

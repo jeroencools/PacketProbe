@@ -155,10 +155,10 @@ $reasons = array_map(fn($a) => $a['Reason'], $anomalies);
 $uniqueReasons = array_values(array_unique($reasons));
 $reasonCounts = array_count_values($reasons);
 
-// --- Dropdown filter and Pie Chart ---
+// --- Only show filter and table ---
 ?>
 <!-- Filter on top -->
-<div class="mb-3">
+<form class="mb-3" id="anomaly-filter-form">
   <label for="anomalyReasonFilter" class="form-label mb-1">Filter by Anomaly Type:</label>
   <select id="anomalyReasonFilter" class="form-select form-select-sm" style="max-width: 300px; display: inline-block;">
     <option value="">All</option>
@@ -166,79 +166,49 @@ $reasonCounts = array_count_values($reasons);
       <option value="<?= htmlspecialchars($reason) ?>"><?= htmlspecialchars($reason) ?></option>
     <?php endforeach; ?>
   </select>
-</div>
+</form>
 
-<!-- Pie chart and table side by side in a card with p-4 padding -->
-<div class="card mb-3" style="height:100%; min-height:0;">
-  <div class="card-body p-4">
-    <div class="d-flex flex-row flex-wrap gap-4 align-items-start" style="height:100%; min-height:0;">
-      <div style="min-width:180px;max-width:200px;display:flex;flex-direction:column;align-items:center;">
-        <canvas id="anomalyPieChart" width="180" height="180"></canvas>
-        <div id="anomalyPieLegend" style="width:100%;margin-top:8px;"></div>
-      </div>
-      <div style="flex:1 1 0;min-width:320px;min-height:0;">
-        <div class="table-responsive" style="max-height:100%;overflow-y:auto;min-height:0;">
+<div class="d-flex flex-column h-100">
+  <div class="card mb-3 flex-grow-1" style="min-height:0; max-height: 100%;">
+    <div class="card-body p-4 d-flex flex-column h-100" style="min-height:0; max-height: 100%; overflow: hidden;">
+      <div class="flex-grow-1 d-flex flex-column min-vh-0" style="min-height:0;">
+        <div class="table-responsive flex-grow-1 mb-3" style="height: 0; min-height: 0; flex-basis: 0;">
           <table id="anomalyTable" class="table table-dark table-striped table-bordered table-sm mb-0">
             <thead>
-              <tr>
-                <th>Reason</th>
-                <?php
-                  if (!empty($anomalies[0]['Packet'])) {
-                      foreach (array_keys($anomalies[0]['Packet']) as $col) {
-                          echo '<th>' . htmlspecialchars($col) . '</th>';
-                      }
-                  }
-                ?>
-              </tr>
-            </thead>
-            <tbody>
-              <?php foreach ($anomalies as $anom): ?>
-                <tr data-reason="<?= htmlspecialchars($anom['Reason']) ?>">
-                  <td><?= htmlspecialchars($anom['Reason']) ?></td>
-                  <?php foreach ($anom['Packet'] as $col => $val): ?>
-                    <?php if (strtolower($col) === 'protocol'): ?>
-                      <td><span class="protocol-link" data-proto="<?= htmlspecialchars($val) ?>"><?= htmlspecialchars($val) ?></span></td>
-                    <?php else: ?>
-                      <td><?= htmlspecialchars($val) ?></td>
-                    <?php endif; ?>
-                  <?php endforeach; ?>
+                <tr>
+                  <th>Reason</th>
+                  <?php
+                    if (!empty($anomalies[0]['Packet'])) {
+                        foreach (array_keys($anomalies[0]['Packet']) as $col) {
+                            echo '<th>' . htmlspecialchars($col) . '</th>';
+                        }
+                    }
+                  ?>
                 </tr>
-              <?php endforeach; ?>
-            </tbody>
+              </thead>
+              <tbody>
+                <?php foreach ($anomalies as $anom): ?>
+                  <tr data-reason="<?= htmlspecialchars($anom['Reason']) ?>">
+                    <td><?= htmlspecialchars($anom['Reason']) ?></td>
+                    <?php foreach ($anom['Packet'] as $col => $val): ?>
+                      <?php if (strtolower($col) === 'protocol'): ?>
+                        <td><span class="protocol-link" data-proto="<?= htmlspecialchars($val) ?>"><?= htmlspecialchars($val) ?></span></td>
+                      <?php else: ?>
+                        <td><?= htmlspecialchars($val) ?></td>
+                      <?php endif; ?>
+                    <?php endforeach; ?>
+                  </tr>
+                <?php endforeach; ?>
+              </tbody>
           </table>
         </div>
       </div>
     </div>
   </div>
 </div>
-<!-- Only load Chart.js if not already loaded -->
-<?php if (empty($GLOBALS['chartjs_loaded'])): $GLOBALS['chartjs_loaded'] = true; ?>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-<?php endif; ?>
 <script>
-document.addEventListener("DOMContentLoaded", function() {
-  // Pie chart data
-  const pieData = {
-    labels: <?= json_encode($uniqueReasons) ?>,
-    datasets: [{
-      data: <?= json_encode(array_values($reasonCounts)) ?>,
-      backgroundColor: [
-        '#ff6384','#36a2eb','#ffce56','#4bc0c0','#9966ff','#ff9f40','#c9cbcf','#e377c2','#7f7f7f','#bcbd22','#17becf'
-      ]
-    }]
-  };
-  const ctx = document.getElementById('anomalyPieChart').getContext('2d');
-  new Chart(ctx, {
-    type: 'pie',
-    data: pieData,
-    options: {
-      plugins: { legend: { position: 'bottom', align: 'center', labels: { boxWidth: 14, padding: 10 } } },
-      responsive: false,
-      maintainAspectRatio: false
-    }
-  });
-
-  // Dropdown filter
+document.addEventListener("DOMContentLoaded", function () {
+  // Table filter
   document.getElementById('anomalyReasonFilter').addEventListener('change', function() {
     const val = this.value;
     document.querySelectorAll('#anomalyTable tbody tr').forEach(row => {
@@ -251,3 +221,7 @@ document.addEventListener("DOMContentLoaded", function() {
   });
 });
 </script>
+<style>
+/* filepath: c:\Users\Jeroen\OneDrive\ICT\5. Code\Webdev\PacketProbe\modules\AnomalyDetection.php */
+.protocol-pie-container { display: none !important; }
+</style>
