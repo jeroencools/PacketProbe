@@ -7,44 +7,6 @@ if (!isset($packets) || !is_array($packets) || count($packets) === 0) {
     return;
 }
 
-// --- Normalize packet keys to expected names regardless of CSV header order or naming ---
-function normalize_packet_keys($packets) {
-    // Map possible header variants to canonical keys
-    $keymap = [
-        'Source' => ['Source', 'Src', 'src'],
-        'Destination' => ['Destination', 'Dst', 'Dest', 'destination'],
-        'Protocol' => ['Protocol', 'Proto', 'protocol'],
-        'Length' => ['Length', 'len', 'length'],
-        'Info' => ['Info', 'info', 'Description', 'description'],
-        'Source Port' => ['Source Port', 'Src port', 'Src Port', 'src port', 'src_port', 'SrcPort', 'Source port'],
-        'Destination Port' => ['Destination Port', 'Dest port', 'Dst port', 'Dest Port', 'dst port', 'dest_port', 'DstPort', 'Destination port'],
-        'Time' => ['Time', 'Timestamp', 'time', 'timestamp'],
-        'No.' => ['No.', 'No', 'no', '#'],
-    ];
-    $normalized = [];
-    foreach ($packets as $pkt) {
-        $newpkt = [];
-        foreach ($keymap as $canon => $aliases) {
-            foreach ($aliases as $alias) {
-                if (array_key_exists($alias, $pkt)) {
-                    $newpkt[$canon] = $pkt[$alias];
-                    break;
-                }
-            }
-        }
-        // Add any other keys as-is
-        foreach ($pkt as $k => $v) {
-            if (!isset($newpkt[$k]) && !in_array($k, array_keys($keymap))) {
-                $newpkt[$k] = $v;
-            }
-        }
-        $normalized[] = $newpkt;
-    }
-    return $normalized;
-}
-
-$packets = normalize_packet_keys($packets);
-
 // --- Modular anomaly detection functions ---
 function detect_port_scans($packets) {
     $anomalies = [];
@@ -195,7 +157,6 @@ $reasonCounts = array_count_values($reasons);
 
 // --- Dropdown filter and Pie Chart ---
 ?>
-
 <!-- Filter on top -->
 <div class="mb-3">
   <label for="anomalyReasonFilter" class="form-label mb-1">Filter by Anomaly Type:</label>
@@ -207,9 +168,7 @@ $reasonCounts = array_count_values($reasons);
   </select>
 </div>
 
-
 <!-- Pie chart and table side by side in a card with p-4 padding -->
-
 <div class="card mb-3" style="height:100%; min-height:0;">
   <div class="card-body p-4">
     <div class="d-flex flex-row flex-wrap gap-4 align-items-start" style="height:100%; min-height:0;">
@@ -252,45 +211,43 @@ $reasonCounts = array_count_values($reasons);
     </div>
   </div>
 </div>
+<!-- Only load Chart.js if not already loaded -->
+<?php if (empty($GLOBALS['chartjs_loaded'])): $GLOBALS['chartjs_loaded'] = true; ?>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<?php endif; ?>
 <script>
-// Pie chart data
-const pieData = {
-  labels: <?= json_encode($uniqueReasons) ?>,
-  datasets: [{
-    data: <?= json_encode(array_values($reasonCounts)) ?>,
-    backgroundColor: [
-      '#ff6384','#36a2eb','#ffce56','#4bc0c0','#9966ff','#ff9f40','#c9cbcf','#e377c2','#7f7f7f','#bcbd22','#17becf'
-    ]
-  }]
-};
-const ctx = document.getElementById('anomalyPieChart').getContext('2d');
-const anomalyPieChart = new Chart(ctx, {
-  type: 'pie',
-  data: pieData,
-  options: {
-    plugins: { legend: { position: 'bottom', align: 'center', labels: { boxWidth: 14, padding: 10 } } },
-    responsive: false,
-    maintainAspectRatio: false
-  }
-});
-// Move legend to custom div below chart
-setTimeout(() => {
-  const legend = anomalyPieChart.generateLegend ? anomalyPieChart.generateLegend() : '';
-  if (legend) {
-    document.getElementById('anomalyPieLegend').innerHTML = legend;
-  }
-}, 100);
-
-// Dropdown filter
-document.getElementById('anomalyReasonFilter').addEventListener('change', function() {
-  const val = this.value;
-  document.querySelectorAll('#anomalyTable tbody tr').forEach(row => {
-    if (!val || row.getAttribute('data-reason') === val) {
-      row.style.display = '';
-    } else {
-      row.style.display = 'none';
+document.addEventListener("DOMContentLoaded", function() {
+  // Pie chart data
+  const pieData = {
+    labels: <?= json_encode($uniqueReasons) ?>,
+    datasets: [{
+      data: <?= json_encode(array_values($reasonCounts)) ?>,
+      backgroundColor: [
+        '#ff6384','#36a2eb','#ffce56','#4bc0c0','#9966ff','#ff9f40','#c9cbcf','#e377c2','#7f7f7f','#bcbd22','#17becf'
+      ]
+    }]
+  };
+  const ctx = document.getElementById('anomalyPieChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'pie',
+    data: pieData,
+    options: {
+      plugins: { legend: { position: 'bottom', align: 'center', labels: { boxWidth: 14, padding: 10 } } },
+      responsive: false,
+      maintainAspectRatio: false
     }
+  });
+
+  // Dropdown filter
+  document.getElementById('anomalyReasonFilter').addEventListener('change', function() {
+    const val = this.value;
+    document.querySelectorAll('#anomalyTable tbody tr').forEach(row => {
+      if (!val || row.getAttribute('data-reason') === val) {
+        row.style.display = '';
+      } else {
+        row.style.display = 'none';
+      }
+    });
   });
 });
 </script>

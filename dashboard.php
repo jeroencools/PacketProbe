@@ -2,6 +2,17 @@
 // Move session_start() and all PHP logic to the very top before any HTML output
 session_start();
 
+// Require column mapping before showing dashboard
+if (!isset($_SESSION['csvFile']) || !is_readable($_SESSION['csvFile'])) {
+    header('Location: index.php');
+    exit;
+}
+if (!isset($_SESSION['csv_mapping'])) {
+    header('Location: map_columns.php');
+    exit;
+}
+$csv_mapping = $_SESSION['csv_mapping'];
+
 // Register a shutdown function to clean up the temp file if the session is destroyed
 register_shutdown_function(function() {
     if (session_status() === PHP_SESSION_ACTIVE && isset($_SESSION['csvFile'])) {
@@ -92,32 +103,12 @@ if (
         }
     }
     $_SESSION['originalPackets'] = $originalPackets;
-} elseif (
-    isset($_GET['csvFile'])
-) {
-    $csvFile = $_GET['csvFile'];
-    $_SESSION['csvFile'] = $csvFile;
-    $originalPackets = [];
-    if ($csvFile && is_readable($csvFile)) {
-        if (($handle = fopen($csvFile, "r")) !== false) {
-            $headers = fgetcsv($handle, 0, ",", '"', "\\");
-            if ($headers && isset($headers[0])) {
-                $headers[0] = preg_replace('/^\xEF\xBB\xBF/', '', $headers[0]);
-            }
-            while (($data = fgetcsv($handle, 0, ",", '"', "\\")) !== false) {
-                if (count($data) !== count($headers)) continue;
-                $originalPackets[] = array_combine($headers, $data);
-            }
-            fclose($handle);
-        }
-    }
-    $_SESSION['originalPackets'] = $originalPackets;
-} else {
-    $csvFile = null;
-    $originalPackets = [];
-    // Do not clear session here!
-    // $_SESSION['originalPackets'] = [];
-    // $_SESSION['csvFileName'] = null;
+}
+
+// Accept mapping from POST (from map_columns.php) and update session
+if (isset($_POST['mapping']) && is_array($_POST['mapping'])) {
+    $_SESSION['csv_mapping'] = $_POST['mapping'];
+    $csv_mapping = $_SESSION['csv_mapping'];
 }
 
 // After parsing $originalPackets, set a variable for the parse status message (for development only):
@@ -130,6 +121,19 @@ if (!empty($originalPackets)) {
     $parseStatusMsg = '<span class="badge bg-warning text-dark ms-3" style="font-size:1rem;vertical-align:middle;">CSV upload attempted, but no rows parsed.</span>';
 } else {
     $parseStatusMsg = '<span class="badge bg-secondary text-light ms-3" style="font-size:1rem;vertical-align:middle;">No CSV parsed yet.</span>';
+}
+
+// Remap $originalPackets to use expected keys (Time, Source, etc) using mapping
+if (!empty($originalPackets) && isset($csv_mapping) && is_array($csv_mapping)) {
+    $remappedPackets = [];
+    foreach ($originalPackets as $row) {
+        $remapped = [];
+        foreach ($csv_mapping as $expected => $actual) {
+            $remapped[$expected] = isset($row[$actual]) ? $row[$actual] : '';
+        }
+        $remappedPackets[] = $remapped;
+    }
+    $originalPackets = $remappedPackets;
 }
 
 // List of available modules for selection (add 'empty' as the first/default)
@@ -241,6 +245,19 @@ $layout = isset($layoutOptions[$selectedLayout]) ? $layoutOptions[$selectedLayou
                         </form>
                         <div class="section-content mt-1" id="section-content-<?php echo $i; ?>">
                             <?php
+
+// Remap $originalPackets to use expected keys (Time, Source, etc) using mapping
+if (!empty($originalPackets) && isset($csv_mapping) && is_array($csv_mapping)) {
+    $remappedPackets = [];
+    foreach ($originalPackets as $row) {
+        $remapped = [];
+        foreach ($csv_mapping as $expected => $actual) {
+            $remapped[$expected] = isset($row[$actual]) ? $row[$actual] : '';
+        }
+        $remappedPackets[] = $remapped;
+    }
+    $originalPackets = $remappedPackets;
+}
                             if ($selectedModules[$i] === 'empty') {
                                 echo '<div class="text-secondary">Please select card content.</div>';
                             } elseif ($selectedModules[$i] === 'packetdetails') {

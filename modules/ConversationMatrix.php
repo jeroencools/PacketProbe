@@ -6,30 +6,11 @@ if (empty($packets) || !is_array($packets)) {
     return;
 }
 
-// Try to detect source/destination IP columns
-$srcKeys = ['src', 'source', 'ip.src', 'Source', 'Src', 'Source IP', 'ip source'];
-$dstKeys = ['dst', 'destination', 'ip.dst', 'Destination', 'Dst', 'Destination IP', 'ip destination'];
-
-// Avoid function redeclaration if this module is included multiple times
-if (!function_exists('conversationmatrix_findKey')) {
-    function conversationmatrix_findKey($headers, $candidates) {
-        foreach ($candidates as $cand) {
-            foreach ($headers as $h) {
-                if (strcasecmp($h, $cand) === 0) return $h;
-            }
-        }
-        return null;
-    }
-}
+// $packets is already mapped to expected keys by dashboard.php, so no further mapping or key detection is needed
 
 $headers = array_keys($packets[0]);
-$srcCol = conversationmatrix_findKey($headers, $srcKeys);
-$dstCol = conversationmatrix_findKey($headers, $dstKeys);
-
-if (!$srcCol || !$dstCol) {
-    echo '<div class="text-danger">Could not detect source/destination IP columns in CSV.</div>';
-    return;
-}
+$srcCol = 'Source';
+$dstCol = 'Destination';
 
 // Build conversation matrix
 $conversations = [];
@@ -85,6 +66,25 @@ usort($matrixRows, function($a, $b) use ($sortOrder) {
     </form>
     <div class="flex-grow-1 overflow-auto">
         <table class="table table-sm table-dark table-bordered align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Source</th>
+                    <th>Destination</th>
+                    <th class="text-end">Packets</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($matrixRows as $row): ?>
+                <tr>
+                    <td><?php echo htmlspecialchars($row['src']); ?></td>
+                    <td><?php echo htmlspecialchars($row['dst']); ?></td>
+                    <td class="text-end"><?php echo $row['count']; ?></td>
+                </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+</div>
             <thead>
                 <tr>
                     <th>Source</th>

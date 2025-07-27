@@ -1,5 +1,5 @@
 <?php
-// Expects $packets (array of associative arrays) to be available
+// $packets is already mapped to expected keys by dashboard.php, so no further mapping is needed here
 
 if (!isset($packets) || !is_array($packets) || count($packets) === 0) {
     echo '<div class="alert alert-warning">No packet data available.</div>';

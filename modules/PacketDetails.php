@@ -1,5 +1,5 @@
 <?php
-// Expects $packets (array of associative arrays) to be available
+// No need to remap or normalize keys here: $packets already uses the expected keys from the mapping in dashboard.php
 
 if (!isset($packets) || !is_array($packets) || count($packets) === 0) {
     echo '<div class="alert alert-warning">No packet data available.</div>';
