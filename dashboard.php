@@ -194,6 +194,13 @@ $cardHeightValue = $cardHeightOptions[$selectedCardHeight]['value'];
     #dashboard-grid .col-lg-6 {
         height: <?php echo htmlspecialchars($cardHeightValue); ?> !important;
     }
+    .dashboard-controls {
+        background: none !important;
+        margin-top: 0.5rem !important;
+        margin-bottom: 0.5rem !important;
+        padding-top: 1.5rem !important;
+        padding-bottom: 1.5rem !important;
+    }
     </style>
 </head>
 <body class="bg-dark text-light vh-100<?php
@@ -220,7 +227,8 @@ $cardHeightValue = $cardHeightOptions[$selectedCardHeight]['value'];
 </h1>
 
 <!-- Responsive controls row with less padding -->
-<div class="dashboard-controls d-flex flex-wrap align-items-center gap-2 py-2 px-2 bg-dark rounded-3 shadow-sm mx-auto flex-row" style="margin-bottom:0; max-width: 100%;">
+<div class="dashboard-controls d-flex flex-wrap align-items-center gap-2 py-3 px-2 rounded-3 mx-auto flex-row"
+     style="margin-top: 0.5rem; margin-bottom: 0.5rem; max-width: 100%; background: none !important;">
     <div class="me-md-3 d-flex align-items-center mb-0 justify-content-center flex-shrink-0">
         <?php echo $parseStatusMsg; ?>
     </div>

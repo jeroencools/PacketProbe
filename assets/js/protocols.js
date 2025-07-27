@@ -2,246 +2,246 @@
 // Protocoluitleg met metaforen, samenvattingen en NL Wikipedia links
 window.protocolExplanations = {
   'HTTP': {
-    metaphor: 'HTTP is als een ober die je bestelling opneemt en je eten vanuit de keuken brengt.',
+    metaphor: 'HTTP is like a waiter taking your order and bringing your food from the kitchen.',
     explanation: [
-      'HTTP staat voor HyperText Transfer Protocol en is de basis voor gegevensoverdracht op het wereldwijde web.',
-      'Het definieert hoe berichten worden opgemaakt en verzonden, en hoe servers en browsers daarop reageren.',
-      'Wanneer je een website bezoekt, stuurt je browser een HTTP-verzoek naar de server, die vervolgens de gevraagde pagina terugstuurt.',
-      'HTTP is stateless: elke aanvraag is op zichzelf staand en de server onthoudt geen gegevens tussen aanvragen.',
-      'Het gebruikt meestal poort 80 en is niet versleuteld, wat het ongeschikt maakt voor gevoelige informatie.'
+      'HTTP stands for HyperText Transfer Protocol and is the foundation for data transfer on the World Wide Web.',
+      'It defines how messages are formatted and transmitted, and how servers and browsers respond.',
+      'When you visit a website, your browser sends an HTTP request to the server, which then returns the requested page.',
+      'HTTP is stateless: each request is independent and the server does not remember previous requests.',
+      'It usually uses port 80 and is not encrypted, making it unsuitable for sensitive information.'
     ],
-    wiki: 'https://nl.wikipedia.org/wiki/Hypertext_Transfer_Protocol'
+    wiki: 'https://en.wikipedia.org/wiki/Hypertext_Transfer_Protocol'
   },
   'HTTPS': {
-    metaphor: 'HTTPS is als je bestelling naar de keuken sturen in een afgesloten doos die alleen de keuken kan openen.',
+    metaphor: 'HTTPS is like sending your order to the kitchen in a locked box that only the kitchen can open.',
     explanation: [
-      'HTTPS staat voor HyperText Transfer Protocol Secure en is de beveiligde versie van HTTP.',
-      'Het gebruikt versleuteling (meestal TLS) om gegevens tussen browser en server te beschermen.',
-      'Zo blijft gevoelige informatie zoals wachtwoorden en betaalgegevens veilig tegen afluisteren.',
-      'HTTPS is onmisbaar voor bankieren, webshops en andere vertrouwelijke toepassingen.',
-      'Het werkt doorgaans via poort 443 en wordt aangeduid met een slotje in de browser.'
+      'HTTPS stands for HyperText Transfer Protocol Secure and is the secure version of HTTP.',
+      'It uses encryption (usually TLS) to protect data between browser and server.',
+      'This keeps sensitive information like passwords and payment details safe from eavesdropping.',
+      'HTTPS is essential for banking, online shopping, and other confidential applications.',
+      'It typically uses port 443 and is indicated by a padlock in the browser.'
     ],
-    wiki: 'https://nl.wikipedia.org/wiki/HTTPS'
+    wiki: 'https://en.wikipedia.org/wiki/HTTPS'
   },
   'DNS': {
-    metaphor: 'DNS is als een telefoonboek dat namen vertaalt naar telefoonnummers zodat je iemand kunt bellen.',
+    metaphor: 'DNS is like a phone book that translates names into phone numbers so you can call someone.',
     explanation: [
-      'DNS staat voor Domain Name System en vertaalt gebruiksvriendelijke domeinnamen naar IP-adressen.',
-      'Wanneer je een website intypt, zoekt de DNS-server het juiste IP-adres op zodat je computer verbinding kan maken.',
-      'Het werkt hiërarchisch en gedistribueerd, met root-, top-level- en authoritatieve servers.',
-      'DNS is essentieel omdat het onpraktisch zou zijn IP-adressen te onthouden.',
-      'Het gebruikt meestal poort 53 en ondersteunt zowel UDP als TCP.'
+      'DNS stands for Domain Name System and translates user-friendly domain names into IP addresses.',
+      'When you type a website address, the DNS server looks up the correct IP address so your computer can connect.',
+      'It works hierarchically and is distributed, with root, top-level, and authoritative servers.',
+      'DNS is essential because remembering IP addresses would be impractical.',
+      'It usually uses port 53 and supports both UDP and TCP.'
     ],
-    wiki: 'https://nl.wikipedia.org/wiki/Domain_Name_System'
+    wiki: 'https://en.wikipedia.org/wiki/Domain_Name_System'
   },
   'ICMP': {
-    metaphor: 'ICMP is als een postkantoor dat een "retour afzender"-bericht stuurt als een brief niet kan worden bezorgd.',
+    metaphor: 'ICMP is like a post office sending a "return to sender" message if a letter cannot be delivered.',
     explanation: [
-      'ICMP staat voor Internet Control Message Protocol en wordt gebruikt voor netwerkdiagnostiek en foutmeldingen.',
-      'Het is vooral bekend van het "ping"-commando om te controleren of een host bereikbaar is.',
-      'Routers en apparaten gebruiken ICMP om problemen te melden zoals onbereikbare bestemmingen of verlopen tijd.',
-      'Het vervoert geen gebruikersdata maar helpt het netwerkverkeer te beheren.',
-      'ICMP werkt direct boven IP en gebruikt geen poorten.'
+      'ICMP stands for Internet Control Message Protocol and is used for network diagnostics and error messages.',
+      'It is best known for the "ping" command to check if a host is reachable.',
+      'Routers and devices use ICMP to report problems such as unreachable destinations or expired time.',
+      'It does not carry user data but helps manage network traffic.',
+      'ICMP works directly above IP and does not use ports.'
     ],
-    wiki: 'https://nl.wikipedia.org/wiki/Internet_Control_Message_Protocol'
+    wiki: 'https://en.wikipedia.org/wiki/Internet_Control_Message_Protocol'
   },
   'TCP': {
-    metaphor: 'TCP is als een telefoongesprek waarbij beide partijen eerst bevestigen dat ze elkaar horen.',
+    metaphor: 'TCP is like a phone call where both parties first confirm they can hear each other.',
     explanation: [
-      'TCP staat voor Transmission Control Protocol en zorgt voor betrouwbare, geordende en foutvrije gegevensoverdracht.',
-      'Het bouwt eerst een verbinding op via een three-way handshake.',
-      'TCP controleert of alle pakketten aankomen en in de juiste volgorde staan, en verzendt verloren pakketten opnieuw.',
-      'Het wordt gebruikt door veel toepassingen, zoals web, e-mail en bestandsoverdracht.',
-      'TCP gebruikt diverse poorten, zoals 80 voor HTTP en 443 voor HTTPS.'
+      'TCP stands for Transmission Control Protocol and ensures reliable, ordered, and error-free data transfer.',
+      'It first establishes a connection via a three-way handshake.',
+      'TCP checks that all packets arrive and are in the correct order, and retransmits lost packets.',
+      'It is used by many applications, such as web, email, and file transfer.',
+      'TCP uses various ports, such as 80 for HTTP and 443 for HTTPS.'
     ],
-    wiki: 'https://nl.wikipedia.org/wiki/Transmission_Control_Protocol'
+    wiki: 'https://en.wikipedia.org/wiki/Transmission_Control_Protocol'
   },
   'UDP': {
-    metaphor: 'UDP is als ansichtkaarten sturen: ze komen snel aan, maar soms in de verkeerde volgorde of helemaal niet.',
+    metaphor: 'UDP is like sending postcards: they arrive quickly, but sometimes out of order or not at all.',
     explanation: [
-      'UDP staat voor User Datagram Protocol en is een lichtgewicht, verbindingsloos protocol.',
-      'Het verzendt gegevens zonder verbinding of garantie voor ontvangst, volgorde of foutcontrole.',
-      'UDP is sneller dan TCP maar minder betrouwbaar, ideaal voor real-time toepassingen zoals video en gaming.',
-      'Het wordt gebruikt voor DNS, VoIP en vele streamingprotocollen.',
-      'UDP gebruikt poorten zoals 53 voor DNS en 123 voor NTP.'
+      'UDP stands for User Datagram Protocol and is a lightweight, connectionless protocol.',
+      'It sends data without connection or guarantee of delivery, order, or error checking.',
+      'UDP is faster than TCP but less reliable, ideal for real-time applications like video and gaming.',
+      'It is used for DNS, VoIP, and many streaming protocols.',
+      'UDP uses ports such as 53 for DNS and 123 for NTP.'
     ],
-    wiki: 'https://nl.wikipedia.org/wiki/User_Datagram_Protocol'
+    wiki: 'https://en.wikipedia.org/wiki/User_Datagram_Protocol'
   },
   'TLSv1.3': {
-    metaphor: 'TLS is als je brief in een gesloten envelop stoppen zodat alleen de ontvanger hem kan lezen.',
+    metaphor: 'TLS is like putting your letter in a sealed envelope so only the recipient can read it.',
     explanation: [
-      'TLS staat voor Transport Layer Security en versleutelt gegevens over netwerken.',
-      'TLSv1.3 is de nieuwste versie met verbeterde veiligheid en prestaties.',
-      'Het wordt gebruikt om HTTPS, e-mail en andere protocollen te beveiligen.',
-      'TLS waarborgt vertrouwelijkheid, integriteit en authenticiteit van gegevens onderweg.',
-      'Het werkt boven TCP, meestal op poort 443 voor HTTPS.'
+      'TLS stands for Transport Layer Security and encrypts data over networks.',
+      'TLSv1.3 is the latest version with improved security and performance.',
+      'It is used to secure HTTPS, email, and other protocols.',
+      'TLS ensures confidentiality, integrity, and authenticity of data in transit.',
+      'It works above TCP, usually on port 443 for HTTPS.'
     ],
-    wiki: 'https://nl.wikipedia.org/wiki/Transport_Layer_Security#TLS_1.3'
+    wiki: 'https://en.wikipedia.org/wiki/Transport_Layer_Security'
   },
   'SMTP': {
-    metaphor: 'SMTP is als een postbode die je brief ophaalt en in de brievenbus van de ontvanger stopt.',
+    metaphor: 'SMTP is like a mailman who picks up your letter and puts it in the recipient\'s mailbox.',
     explanation: [
-      'SMTP staat voor Simple Mail Transfer Protocol en verzendt e-mails tussen servers.',
-      'Het verzorgt de aflevering van uitgaande e-mails van de verzender naar de server van de ontvanger.',
-      'SMTP is een push-protocol: het duwt e-mails naar de volgende server.',
-      'Voor ophalen van e-mail worden POP3 of IMAP gebruikt.',
-      'SMTP gebruikt doorgaans poort 25, 465 of 587.'
+      'SMTP stands for Simple Mail Transfer Protocol and sends emails between servers.',
+      'It handles the delivery of outgoing emails from the sender to the recipient\'s server.',
+      'SMTP is a push protocol: it pushes emails to the next server.',
+      'POP3 or IMAP are used for retrieving email.',
+      'SMTP typically uses port 25, 465, or 587.'
     ],
-    wiki: 'https://nl.wikipedia.org/wiki/Simple_Mail_Transfer_Protocol'
+    wiki: 'https://en.wikipedia.org/wiki/Simple_Mail_Transfer_Protocol'
   },
   'POP3': {
-    metaphor: 'POP3 is als je post ophalen en alles mee naar huis nemen.',
+    metaphor: 'POP3 is like picking up your mail and taking everything home.',
     explanation: [
-      'POP3 staat voor Post Office Protocol versie 3 en haalt e-mail op van een server.',
-      'Bij het ophalen downloadt POP3 de berichten en verwijdert ze meestal van de server.',
-      'Het is eenvoudig en geschikt voor mensen die e-mail op één apparaat lezen.',
-      'POP3 ondersteunt geen servermappen of synchronisatie.',
-      'Het gebruikt meestal poort 110.'
+      'POP3 stands for Post Office Protocol version 3 and retrieves email from a server.',
+      'When retrieving, POP3 downloads the messages and usually deletes them from the server.',
+      'It is simple and suitable for people who read email on one device.',
+      'POP3 does not support server folders or synchronization.',
+      'It usually uses port 110.'
     ],
-    wiki: 'https://nl.wikipedia.org/wiki/Post_Office_Protocol'
+    wiki: 'https://en.wikipedia.org/wiki/Post_Office_Protocol'
   },
   'IMAP': {
-    metaphor: 'IMAP is als je post lezen op het postkantoor, waarbij je alles daar laat staan.',
+    metaphor: 'IMAP is like reading your mail at the post office, leaving everything there.',
     explanation: [
-      'IMAP staat voor Internet Message Access Protocol en geeft toegang tot e-mails op een server.',
-      'In tegenstelling tot POP3 kun je berichten lezen en organiseren zonder ze te downloaden.',
-      'IMAP ondersteunt meerdere apparaten en houdt alles overal gesynchroniseerd.',
-      'Het is ideaal voor gebruikers die vanaf verschillende locaties of apparaten werken.',
-      'IMAP gebruikt meestal poort 143 of 993 (beveiligd).'
+      'IMAP stands for Internet Message Access Protocol and gives access to emails on a server.',
+      'Unlike POP3, you can read and organize messages without downloading them.',
+      'IMAP supports multiple devices and keeps everything synchronized everywhere.',
+      'It is ideal for users who work from different locations or devices.',
+      'IMAP usually uses port 143 or 993 (secure).'
     ],
-    wiki: 'https://nl.wikipedia.org/wiki/Internet_Message_Access_Protocol'
+    wiki: 'https://en.wikipedia.org/wiki/Internet_Message_Access_Protocol'
   },
   'FTP': {
-    metaphor: 'FTP is als een koeriersdienst die dozen tussen magazijnen vervoert.',
+    metaphor: 'FTP is like a courier service transporting boxes between warehouses.',
     explanation: [
-      'FTP staat voor File Transfer Protocol en verplaatst bestanden tussen computers via een netwerk.',
-      'Gebruikers kunnen bestanden uploaden, downloaden en beheren op externe servers.',
-      'FTP is standaard niet versleuteld, dus gevoelige data moet via SFTP of FTPS.',
-      'Het werkt in actieve of passieve modus voor firewall/NAT-compatibiliteit.',
-      'FTP gebruikt doorgaans poorten 21 (besturing) en 20 (data).'
+      'FTP stands for File Transfer Protocol and moves files between computers over a network.',
+      'Users can upload, download, and manage files on remote servers.',
+      'FTP is not encrypted by default, so sensitive data should use SFTP or FTPS.',
+      'It works in active or passive mode for firewall/NAT compatibility.',
+      'FTP typically uses ports 21 (control) and 20 (data).'
     ],
-    wiki: 'https://nl.wikipedia.org/wiki/File_Transfer_Protocol'
+    wiki: 'https://en.wikipedia.org/wiki/File_Transfer_Protocol'
   },
   'QUIC': {
-    metaphor: 'QUIC is als een hogesnelheidstrein die je sneller en veiliger op je bestemming brengt.',
+    metaphor: 'QUIC is like a high-speed train that gets you to your destination faster and more securely.',
     explanation: [
-      'QUIC staat voor Quick UDP Internet Connections en is een modern transportprotocol ontwikkeld door Google.',
-      'Het werkt over UDP en biedt functies vergelijkbaar met TCP+TLS, maar met lagere latency en snellere connecties.',
-      'QUIC is bedoeld voor webverkeer, vooral HTTP/3, en presteert beter op onbetrouwbare netwerken.',
-      'Het biedt ingebouwde encryptie en multiplexing van streams.',
-      'QUIC wordt gebruikt door grote websites zoals Google en YouTube en gebruikt UDP, meestal poort 443.'
+      'QUIC stands for Quick UDP Internet Connections and is a modern transport protocol developed by Google.',
+      'It works over UDP and offers features similar to TCP+TLS, but with lower latency and faster connections.',
+      'QUIC is intended for web traffic, especially HTTP/3, and performs better on unreliable networks.',
+      'It provides built-in encryption and multiplexing of streams.',
+      'QUIC is used by major websites like Google and YouTube and uses UDP, usually port 443.'
     ],
-    wiki: 'https://nl.wikipedia.org/wiki/QUIC'
+    wiki: 'https://en.wikipedia.org/wiki/QUIC'
   },
   'ARP': {
-    metaphor: 'ARP is als in een kamer vragen: "Wie heeft dit telefoonnummer?" tot iemand antwoordt.',
+    metaphor: 'ARP is like asking in a room: "Who has this phone number?" until someone answers.',
     explanation: [
-      'ARP staat voor Address Resolution Protocol en vertaalt IP-adressen naar MAC-adressen binnen een lokaal netwerk.',
-      'Wanneer een apparaat een ander op hetzelfde LAN wil bereiken, vraagt het via ARP om het hardware-adres.',
-      'ARP-verzoeken worden als broadcast verzonden en het apparaat met het juiste IP reageert.',
-      'ARP is essentieel voor lokale netwerken en werkt op laag 2.',
-      'ARP gebruikt geen poorten en is niet routerbaar buiten het lokale netwerk.'
+      'ARP stands for Address Resolution Protocol and translates IP addresses to MAC addresses within a local network.',
+      'When a device wants to reach another on the same LAN, it uses ARP to ask for the hardware address.',
+      'ARP requests are sent as broadcasts and the device with the correct IP responds.',
+      'ARP is essential for local networks and works at layer 2.',
+      'ARP does not use ports and is not routable outside the local network.'
     ],
-    wiki: 'https://nl.wikipedia.org/wiki/Address_Resolution_Protocol'
+    wiki: 'https://en.wikipedia.org/wiki/Address_Resolution_Protocol'
   },
   'DHCP': {
-    metaphor: 'DHCP is als een hotelreceptie die je een kamernummer toewijst bij het inchecken.',
+    metaphor: 'DHCP is like a hotel reception assigning you a room number when you check in.',
     explanation: [
-      'DHCP staat voor Dynamic Host Configuration Protocol en wijst automatisch IP-adressen toe aan apparaten op een netwerk.',
-      'Bij verbinding vraagt een apparaat een IP aan en de DHCP-server geeft een vrij adres.',
-      'DHCP verstrekt ook andere instellingen zoals gateway en DNS.',
-      'Het vereenvoudigt netwerkbeheer door handmatige configuratie te vermijden.',
-      'DHCP gebruikt UDP-poorten 67 en 68.'
+      'DHCP stands for Dynamic Host Configuration Protocol and automatically assigns IP addresses to devices on a network.',
+      'When connecting, a device requests an IP and the DHCP server gives a free address.',
+      'DHCP also provides other settings like gateway and DNS.',
+      'It simplifies network management by avoiding manual configuration.',
+      'DHCP uses UDP ports 67 and 68.'
     ],
-    wiki: 'https://nl.wikipedia.org/wiki/Dynamic_Host_Configuration_Protocol'
+    wiki: 'https://en.wikipedia.org/wiki/Dynamic_Host_Configuration_Protocol'
   },
   'mDNS': {
-    metaphor: 'mDNS is als je in de buurt vraagt of iemand weet waar je vriend woont, zonder centraal register.',
+    metaphor: 'mDNS is like asking around locally if anyone knows where your friend lives, without a central register.',
     explanation: [
-      'mDNS staat voor Multicast DNS en laat apparaten hostnamen omzetten naar IP-adressen binnen lokale netwerken zonder centrale server.',
-      'Het wordt vaak gebruikt voor apparaatdetectie thuis of op kantoor (bijv. printers, smart-tv’s).',
-      'mDNS-verzoeken gaan via multicast en apparaten reageren als zij de naam herkennen.',
-      'Het werkt via UDP-poort 5353.',
-      'mDNS is onderdeel van Apple’s Bonjour en vergelijkbare zero-configuration netwerken.'
+      'mDNS stands for Multicast DNS and lets devices resolve hostnames to IP addresses within local networks without a central server.',
+      'It is often used for device discovery at home or in offices (e.g., printers, smart TVs).',
+      'mDNS requests are sent via multicast and devices respond if they recognize the name.',
+      'It works via UDP port 5353.',
+      'mDNS is part of Apple’s Bonjour and similar zero-configuration networks.'
     ],
-    wiki: 'https://nl.wikipedia.org/wiki/Multicast_DNS'
+    wiki: 'https://en.wikipedia.org/wiki/Multicast_DNS'
   },
   'SSDP': {
-    metaphor: 'SSDP is als roepen in een kamer om te zien wie antwoordt, zodat apparaten elkaar automatisch vinden.',
+    metaphor: 'SSDP is like shouting in a room to see who answers, so devices can automatically find each other.',
     explanation: [
-      'SSDP staat voor Simple Service Discovery Protocol en helpt apparaten en diensten op een lokaal netwerk elkaar te ontdekken.',
-      'Het is onderdeel van het UPnP-protocol.',
-      'Apparaten kondigen zich aan en luisteren naar discovery-verzoeken via multicast.',
-      'SSDP gebruikt UDP-poort 1900.',
-      'Het wordt vaak gebruikt door smart-tv’s, mediaservers en IoT-apparaten.'
+      'SSDP stands for Simple Service Discovery Protocol and helps devices and services on a local network discover each other.',
+      'It is part of the UPnP protocol.',
+      'Devices announce themselves and listen for discovery requests via multicast.',
+      'SSDP uses UDP port 1900.',
+      'It is often used by smart TVs, media servers, and IoT devices.'
     ],
-    wiki: 'https://nl.wikipedia.org/wiki/Simple_Service_Discovery_Protocol'
+    wiki: 'https://en.wikipedia.org/wiki/Simple_Service_Discovery_Protocol'
   },
   'SFTP': {
-    metaphor: 'SFTP is als een beveiligde kluiswagen die je waardevolle spullen vervoert.',
+    metaphor: 'SFTP is like an armored truck securely transporting your valuables.',
     explanation: [
-      'SFTP staat voor SSH File Transfer Protocol en is een beveiligd alternatief voor FTP.',
-      'Het werkt over SSH en versleutelt alle gegevens tijdens overdracht.',
-      'SFTP biedt veilige upload, download en bestandsbeheer op externe servers.',
-      'Het wordt veel gebruikt voor gevoelige gegevens zoals back-ups en financiële bestanden.',
-      'SFTP gebruikt standaard poort 22 (SSH).'
+      'SFTP stands for SSH File Transfer Protocol and is a secure alternative to FTP.',
+      'It works over SSH and encrypts all data during transfer.',
+      'SFTP provides secure upload, download, and file management on remote servers.',
+      'It is widely used for sensitive data such as backups and financial files.',
+      'SFTP uses port 22 (SSH) by default.'
     ],
-    wiki: 'https://nl.wikipedia.org/wiki/SSH_File_Transfer_Protocol'
+    wiki: 'https://en.wikipedia.org/wiki/SSH_File_Transfer_Protocol'
   },
   'SSH': {
-    metaphor: 'SSH is als een beveiligde lijn waarmee je op afstand inlogt op een computer zonder dat iemand meeluistert.',
+    metaphor: 'SSH is like a secure line allowing you to log in to a computer remotely without anyone eavesdropping.',
     explanation: [
-      'SSH staat voor Secure Shell en biedt veilige toegang tot computers op afstand.',
-      'Het versleutelt alle communicatie, inclusief wachtwoorden en commando’s.',
-      'SSH wordt vaak gebruikt voor serverbeheer, tunnels en bestandsoverdracht (SFTP).',
-      'Het ondersteunt authenticatie via wachtwoord of sleutels.',
-      'SSH gebruikt standaard poort 22.'
+      'SSH stands for Secure Shell and provides secure remote access to computers.',
+      'It encrypts all communication, including passwords and commands.',
+      'SSH is often used for server management, tunnels, and file transfer (SFTP).',
+      'It supports authentication via password or keys.',
+      'SSH uses port 22 by default.'
     ],
-    wiki: 'https://nl.wikipedia.org/wiki/Secure_Shell'
+    wiki: 'https://en.wikipedia.org/wiki/Secure_Shell'
   },
   'SNMP': {
-    metaphor: 'SNMP is als een conciërge die regelmatig alle apparaten controleert en rapporteert hoe het gaat.',
+    metaphor: 'SNMP is like a concierge regularly checking all devices and reporting how they are doing.',
     explanation: [
-      'SNMP staat voor Simple Network Management Protocol en wordt gebruikt voor netwerkbeheer.',
-      'Het verzamelt informatie over apparaten zoals routers, switches en printers.',
-      'Beheersoftware gebruikt SNMP om status en statistieken op te vragen of waarschuwingen te ontvangen.',
-      'SNMP kent verschillende versies, waarbij v3 beveiliging en encryptie biedt.',
-      'SNMP gebruikt standaard UDP-poort 161 (queries) en 162 (traps).'
+      'SNMP stands for Simple Network Management Protocol and is used for network management.',
+      'It collects information about devices such as routers, switches, and printers.',
+      'Management software uses SNMP to query status and statistics or receive alerts.',
+      'SNMP has different versions, with v3 offering security and encryption.',
+      'SNMP uses UDP port 161 (queries) and 162 (traps) by default.'
     ],
-    wiki: 'https://nl.wikipedia.org/wiki/Simple_Network_Management_Protocol'
+    wiki: 'https://en.wikipedia.org/wiki/Simple_Network_Management_Protocol'
   },
   'NTP': {
-    metaphor: 'NTP is als een atoomklok die je horloge altijd op de juiste tijd zet.',
+    metaphor: 'NTP is like an atomic clock that always sets your watch to the correct time.',
     explanation: [
-      'NTP staat voor Network Time Protocol en synchroniseert de klok van apparaten via het netwerk.',
-      'Het zorgt ervoor dat computers wereldwijd nauwkeurig dezelfde tijd hanteren.',
-      'NTP gebruikt hiërarchische servers (stratum-niveaus) om de tijd te verspreiden.',
-      'NTP kan correcties in milliseconden uitvoeren voor nauwkeurigheid.',
-      'Het gebruikt UDP-poort 123.'
+      'NTP stands for Network Time Protocol and synchronizes the clock of devices over the network.',
+      'It ensures that computers worldwide keep the same accurate time.',
+      'NTP uses hierarchical servers (stratum levels) to distribute the time.',
+      'NTP can make corrections in milliseconds for accuracy.',
+      'It uses UDP port 123.'
     ],
-    wiki: 'https://nl.wikipedia.org/wiki/Network_Time_Protocol'
+    wiki: 'https://en.wikipedia.org/wiki/Network_Time_Protocol'
   },
   'LDAP': {
-    metaphor: 'LDAP is als een telefoonboek waar je snel kunt opzoeken wie iemand is en welke rechten hij heeft.',
+    metaphor: 'LDAP is like a phone book where you can quickly look up who someone is and what rights they have.',
     explanation: [
-      'LDAP staat voor Lightweight Directory Access Protocol en wordt gebruikt voor toegang tot directorydiensten.',
-      'Het beheert gegevens zoals gebruikersaccounts, groepen en apparaten binnen organisaties.',
-      'LDAP-servers worden vaak gebruikt voor authenticatie en autorisatie (Active Directory).',
-      'LDAP ondersteunt hiërarchische datamodellen voor efficiënt zoeken.',
-      'LDAP gebruikt standaard poort 389, LDAPS (secure) poort 636.'
+      'LDAP stands for Lightweight Directory Access Protocol and is used for accessing directory services.',
+      'It manages data such as user accounts, groups, and devices within organizations.',
+      'LDAP servers are often used for authentication and authorization (Active Directory).',
+      'LDAP supports hierarchical data models for efficient searching.',
+      'LDAP uses port 389 by default, LDAPS (secure) uses port 636.'
     ],
-    wiki: 'https://nl.wikipedia.org/wiki/Lightweight_Directory_Access_Protocol'
+    wiki: 'https://en.wikipedia.org/wiki/Lightweight_Directory_Access_Protocol'
   },
   'RDP': {
-    metaphor: 'RDP is als een afstandsbediening waarmee je een andere computer volledig kunt bedienen alsof je ervoor zit.',
+    metaphor: 'RDP is like a remote control that lets you fully operate another computer as if you were sitting in front of it.',
     explanation: [
-      'RDP staat voor Remote Desktop Protocol en laat je op afstand een grafische sessie starten op een andere computer.',
-      'Het wordt veel gebruikt voor support en beheer van Windows-systemen.',
-      'RDP verzendt scherm- en invoergegevens tussen client en server.',
-      'Het ondersteunt versleuteling en diverse beveiligingsopties.',
-      'RDP gebruikt standaard TCP-poort 3389.'
+      'RDP stands for Remote Desktop Protocol and allows you to start a graphical session on another computer remotely.',
+      'It is widely used for support and management of Windows systems.',
+      'RDP transmits screen and input data between client and server.',
+      'It supports encryption and various security options.',
+      'RDP uses TCP port 3389 by default.'
     ],
-    wiki: 'https://nl.wikipedia.org/wiki/Remote_Desktop_Protocol'
+    wiki: 'https://en.wikipedia.org/wiki/Remote_Desktop_Protocol'
   }
 };
 

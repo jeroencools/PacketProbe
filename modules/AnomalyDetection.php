@@ -223,5 +223,5 @@ document.addEventListener("DOMContentLoaded", function () {
 </script>
 <style>
 /* filepath: c:\Users\Jeroen\OneDrive\ICT\5. Code\Webdev\PacketProbe\modules\AnomalyDetection.php */
-.protocol-pie-container { display: none !important; }
+/* .protocol-pie-container { display: none !important; } */
 </style>
