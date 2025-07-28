@@ -212,63 +212,59 @@ $cardHeightValue = $cardHeightOptions[$selectedCardHeight]['value'];
         echo ' light-mode';
     }
 ?>" id="body-root">
-    <div class="container-fluid h-100 py-4">
-        <!-- Dark/Light mode toggle (top left) -->
-        <div style="position: absolute; top: 18px; left: 18px; z-index: 10;">
-            <label class="form-switch d-flex align-items-center gap-2" style="user-select:none;">
-                <input type="checkbox" id="themeToggle" class="form-check-input" style="width:2em;height:1em;">
-                <span id="themeLabel" style="font-size:1rem;">🌙</span>
-            </label>
-        </div>
-
-<h1 class="mb-2 text-center d-flex justify-content-center align-items-center gap-3" style="gap: 1rem;">
-    <span>PacketProbe - Dashboard</span>
-            <a href="index.php" class="btn btn-secondary me-2" style="min-width: 90px;">&larr; Back</a>
-</h1>
-
-<!-- Responsive controls row with less padding -->
-<div class="dashboard-controls d-flex flex-wrap align-items-center gap-2 py-3 px-2 rounded-3 mx-auto flex-row"
-     style="margin-top: 0.5rem; margin-bottom: 0.5rem; max-width: 100%; background: none !important;">
-    <div class="me-md-3 d-flex align-items-center mb-0 justify-content-center flex-shrink-0">
-        <?php echo $parseStatusMsg; ?>
+    <!-- Dark/Light mode toggle (top left) -->
+    <div style="position: absolute; top: 18px; left: 18px; z-index: 10;">
+        <label class="form-switch d-flex align-items-center gap-2" style="user-select:none;">
+            <input type="checkbox" id="themeToggle" class="form-check-input" style="width:2em;height:1em;">
+            <span id="themeLabel" style="font-size:1rem;">🌙</span>
+        </label>
     </div>
-    <form method="post" class="d-flex flex-wrap align-items-center gap-2 m-0 p-0 justify-content-center" id="layout-form" style="font-size: 0.95rem;">
-        <!-- Back button to upload page -->
+    <div class="container min-vh-100 d-flex flex-column justify-content-center align-items-center py-4">
+        <div class="card shadow-lg p-4 bg-dark text-light border-secondary w-100" style="max-width: 1400px;">
+            <div class="d-flex flex-column flex-md-row align-items-center justify-content-between mb-3 gap-2">
+                <h1 class="mb-0 text-center flex-grow-1">PacketProbe - Dashboard</h1>
+                <a href="index.php" class="btn btn-secondary ms-md-3" style="min-width: 90px;">&larr; Back</a>
+            </div>
+            <div class="dashboard-controls d-flex flex-wrap align-items-center gap-2 py-3 px-2 rounded-3 mx-auto flex-row"
+                 style="margin-top: 0.5rem; margin-bottom: 0.5rem; max-width: 100%; background: none !important;">
+                <div class="me-md-3 d-flex align-items-center mb-0 justify-content-center flex-shrink-0">
+                    <?php echo $parseStatusMsg; ?>
+                </div>
+                <form method="post" class="d-flex flex-wrap align-items-center gap-2 m-0 p-0 justify-content-center" id="layout-form" style="font-size: 0.95rem;">
+                    <input type="hidden" name="csvFile" value="<?php echo htmlspecialchars($csvFile ?? ''); ?>">
+                    <?php
+                    // Preserve module selections
+                    for ($j = 0; $j < $totalCards; $j++) {
+                        if (isset($selectedModules[$j])) {
+                            echo '<input type="hidden" name="module' . $j . '" value="' . htmlspecialchars($selectedModules[$j]) . '">';
+                        }
+                    }
+                    ?>
+                    <label for="layout" class="me-2 mb-0">Grid Layout:</label>
+                    <select name="layout" id="layout" class="form-select w-auto d-inline-block me-2" onchange="this.form.submit()" style="margin-bottom:0;">
+                        <option value="2x3" <?php if ($selectedLayout === '2x3') echo 'selected'; ?>>Standard (2 rows x 3 columns)</option>
+                        <option value="3x2" <?php if ($selectedLayout === '3x2') echo 'selected'; ?>>Wide (3 rows x 2 columns)</option>
+                        <option value="6x1" <?php if ($selectedLayout === '6x1') echo 'selected'; ?>>Single Column (6 rows x 1 column)</option>
+                    </select>
+                    <label for="cardHeight" class="me-2 mb-0">Card Height:</label>
+                    <select name="cardHeight" id="cardHeight" class="form-select w-auto d-inline-block" onchange="this.form.submit()" style="margin-bottom:0;">
+                        <?php foreach ($cardHeightOptions as $key => $opt): ?>
+                            <option value="<?php echo htmlspecialchars($key); ?>" <?php if ($selectedCardHeight === $key) echo 'selected'; ?>>
+                                <?php echo htmlspecialchars($opt['label']); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </form>
+            </div>
+            <div class="row g-3 h-100" id="dashboard-grid" style="min-height: 0;">
+                <?php
+                // Determine column class based on layout
+                $colClass = '';
+                if ($selectedLayout === '2x3') $colClass = 'col-12 col-md-6 col-lg-4';
+                elseif ($selectedLayout === '3x2') $colClass = 'col-12 col-md-4 col-lg-6';
+                elseif ($selectedLayout === '6x1') $colClass = 'col-12';
 
-        <input type="hidden" name="csvFile" value="<?php echo htmlspecialchars($csvFile ?? ''); ?>">
-        <?php
-        // Preserve module selections
-        for ($j = 0; $j < $totalCards; $j++) {
-            if (isset($selectedModules[$j])) {
-                echo '<input type="hidden" name="module' . $j . '" value="' . htmlspecialchars($selectedModules[$j]) . '">';
-            }
-        }
-        ?>
-        <label for="layout" class="me-2 mb-0">Grid Layout:</label>
-        <select name="layout" id="layout" class="form-select w-auto d-inline-block me-2" onchange="this.form.submit()" style="margin-bottom:0;">
-            <option value="2x3" <?php if ($selectedLayout === '2x3') echo 'selected'; ?>>Standard (2 rows x 3 columns)</option>
-            <option value="3x2" <?php if ($selectedLayout === '3x2') echo 'selected'; ?>>Wide (3 rows x 2 columns)</option>
-            <option value="6x1" <?php if ($selectedLayout === '6x1') echo 'selected'; ?>>Single Column (6 rows x 1 column)</option>
-        </select>
-        <label for="cardHeight" class="me-2 mb-0">Card Height:</label>
-        <select name="cardHeight" id="cardHeight" class="form-select w-auto d-inline-block" onchange="this.form.submit()" style="margin-bottom:0;">
-            <?php foreach ($cardHeightOptions as $key => $opt): ?>
-                <option value="<?php echo htmlspecialchars($key); ?>" <?php if ($selectedCardHeight === $key) echo 'selected'; ?>>
-                    <?php echo htmlspecialchars($opt['label']); ?>
-                </option>
-            <?php endforeach; ?>
-        </select>
-    </form>
-</div>
-        <div class="row g-3 h-100" id="dashboard-grid" style="min-height: 0;">
-            <?php
-            // Determine column class based on layout
-            $colClass = '';
-            if ($selectedLayout === '2x3') $colClass = 'col-12 col-md-6 col-lg-4';
-            elseif ($selectedLayout === '3x2') $colClass = 'col-12 col-md-4 col-lg-6';
-            elseif ($selectedLayout === '6x1') $colClass = 'col-12';
-
-            for ($i = 0; $i < $totalCards; $i++): ?>
+                for ($i = 0; $i < $totalCards; $i++): ?>
 <div class="<?php echo $colClass; ?> d-flex align-items-stretch" style="min-height: 0;">
     <div class="card h-100 bg-dark text-light border-secondary w-100" style="min-height: 0; ">
         <div class="card-body d-flex flex-column overflow-auto" style="min-height: 0; height: 100%;">
@@ -347,7 +343,13 @@ if (!empty($originalPackets) && isset($csv_mapping) && is_array($csv_mapping)) {
     </div>
 </div>
 <?php endfor; ?>
+            </div>
         </div>
+        <footer class="mt-4 text-center text-secondary small">
+            <a href="https://jeroenict.be" target="_blank" rel="noopener">
+                <img src="assets/img/logo-transp-green.png" alt="Jeroen ICT Logo" style="height: 40px; opacity: 0.9; border-radius: 0.5rem;">
+            </a>
+        </footer>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="assets/js/dashboard.js"></script>

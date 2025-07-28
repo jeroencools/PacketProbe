@@ -126,6 +126,43 @@ document.addEventListener('DOMContentLoaded', function() {
     updateFlexLayout();
     window.addEventListener('resize', updateFlexLayout);
 
+    // --- Light/Dark mode support for topology background and text ---
+    function updateTopologyBackgroundAndText() {
+        var isLight = document.body.classList.contains('light-mode');
+        container.style.background = isLight ? '#f8f9fa' : '#222';
+
+        // Update node and edge label colors
+        var nodeFontColor = isLight ? '#23272b' : '#fff';
+        var edgeFontColor = isLight ? '#23272b' : '#fff';
+        if (window.network) {
+            // Update all nodes' font color
+            var updatedNodes = network.body.data.nodes.get().map(function(n) {
+                return Object.assign({}, n, { font: Object.assign({}, n.font, { color: nodeFontColor }) });
+            });
+            network.body.data.nodes.update(updatedNodes);
+
+            // Update all edges' font color (if any labels)
+            var updatedEdges = network.body.data.edges.get().map(function(e) {
+                if (e.label) {
+                    return Object.assign({}, e, { font: Object.assign({}, e.font, { color: edgeFontColor }) });
+                }
+                return e;
+            });
+            network.body.data.edges.update(updatedEdges);
+        }
+    }
+    updateTopologyBackgroundAndText();
+
+    // Observe class changes on body for theme switching
+    var observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+            if (mutation.attributeName === 'class') {
+                updateTopologyBackgroundAndText();
+            }
+        });
+    });
+    observer.observe(document.body, { attributes: true });
+
     // Prepare nodes with dynamic size and color based on packet count
     var nodes = [
         <?php
@@ -223,6 +260,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
     var network = new vis.Network(container, data, options);
+    window.network = network; // Expose for theme updates
 
     // Edge and node click handler
     network.on("click", function(params) {

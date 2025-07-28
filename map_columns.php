@@ -87,117 +87,125 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mapping'])) {
             <span id="themeLabel" style="font-size:1rem;">🌙</span>
         </label>
     </div>
-    <div class="container py-5">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="mb-0">Map CSV Columns</h2>
-            <form onsubmit="return false;" class="m-0 p-0">
-                <button type="submit" class="btn btn-primary" onclick="document.getElementById('mappingForm').submit();">Continue to Dashboard</button>
-            </form>
-        </div>
-        <div class="mb-4">
-            <div class="row">
-                <div class="col-md-6 mb-2">
-                    <div class="card bg-secondary text-light">
-                        <div class="card-header py-2">
-                            <strong>CSV Columns Detected</strong>
-                        </div>
-                        <div class="card-body py-2">
-                            <?php
-                            // Move 'No.' to the front if present
-                            $headersOrdered = $headers;
-                            $noIndex = array_search('No.', $headersOrdered);
-                            if ($noIndex !== false) {
-                                array_unshift($headersOrdered, array_splice($headersOrdered, $noIndex, 1)[0]);
-                            }
-                            foreach ($headersOrdered as $h): ?>
-                                <span class="badge bg-light text-dark me-1 mb-1"><?php echo htmlspecialchars($h); ?></span>
-                            <?php endforeach; ?>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6 mb-2">
-                    <div class="card bg-dark border-secondary text-light">
-                        <div class="card-header py-2">
-                            <strong>Fields Required by App</strong>
-                        </div>
-                        <div class="card-body py-2">
-                            <?php foreach ($expectedFields as $field): ?>
-                                <span class="badge bg-info text-dark me-1 mb-1"><?php echo htmlspecialchars($field); ?></span>
-                            <?php endforeach; ?>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <p class="mb-3">Please match each <span class="fw-bold text-info">expected field</span> to the correct <span class="fw-bold text-light bg-secondary px-1 rounded">CSV column</span> from your uploaded file.</p>
-        <form method="post" id="mappingForm" action="dashboard.php">
-            <div class="table-responsive mb-4">
-                <table class="table table-dark table-bordered align-middle w-100" style="min-width: 400px; table-layout: fixed;">
-                    <colgroup>
-                        <col style="width: 60%;">
-                        <col style="width: 40%;">
-                    </colgroup>
-                    <thead>
-                        <tr>
-                            <th class="text-center">CSV Column</th>
-                            <th class="text-center">Expected Field (App)</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($expectedFields as $field): ?>
-                            <tr>
-                                <td>
-                                    <select name="mapping[<?php echo htmlspecialchars($field); ?>]" class="form-select mapping-dropdown" data-field="<?php echo htmlspecialchars($field); ?>" required>
-                                        <option value="">-- Select CSV column --</option>
-                                        <?php
-                                        // Use $headersOrdered for dropdowns
-                                        foreach ($headersOrdered as $h): ?>
-                                            <option value="<?php echo htmlspecialchars($h); ?>"
-                                                <?php if (strtolower($h) === strtolower($field)) echo 'selected'; ?>>
-                                                <?php echo htmlspecialchars($h); ?>
-                                            </option>
-                                        <?php endforeach; ?>
-                                    </select>
-                                </td>
-                                <td>
-                                    <span class="fw-bold text-info"><?php echo htmlspecialchars($field); ?></span>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
+    <div class="container min-vh-100 d-flex flex-column justify-content-center align-items-center py-4">
+        <div class="card shadow-lg p-4 bg-dark text-light border-secondary w-100" style="max-width: 1400px;">
+            <div class="d-flex flex-column flex-md-row align-items-center justify-content-between mb-3 gap-2">
+                <h2 class="mb-0 text-center flex-grow-1">Map CSV Columns</h2>
+                <a href="index.php" class="btn btn-secondary ms-md-3" style="min-width: 90px;">&larr; Back</a>
             </div>
             <div class="mb-4">
-                <label class="form-label fw-bold">CSV Preview (first 5 rows):</label>
-                <div class="table-responsive">
-                    <table class="table table-dark table-bordered mb-0">
+                <div class="row">
+                    <div class="col-md-6 mb-2">
+                        <div class="card bg-secondary text-light">
+                            <div class="card-header py-2">
+                                <strong>CSV Columns Detected</strong>
+                            </div>
+                            <div class="card-body py-2">
+                                <?php
+                                // Move 'No.' to the front if present
+                                $headersOrdered = $headers;
+                                $noIndex = array_search('No.', $headersOrdered);
+                                if ($noIndex !== false) {
+                                    array_unshift($headersOrdered, array_splice($headersOrdered, $noIndex, 1)[0]);
+                                }
+                                foreach ($headersOrdered as $h): ?>
+                                    <span class="badge bg-light text-dark me-1 mb-1"><?php echo htmlspecialchars($h); ?></span>
+                                <?php endforeach; ?>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-2">
+                        <div class="card bg-dark border-secondary text-light">
+                            <div class="card-header py-2">
+                                <strong>Fields Required by App</strong>
+                            </div>
+                            <div class="card-body py-2">
+                                <?php foreach ($expectedFields as $field): ?>
+                                    <span class="badge bg-info text-dark me-1 mb-1"><?php echo htmlspecialchars($field); ?></span>
+                                <?php endforeach; ?>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p class="mb-3">Please match each <span class="fw-bold text-info">expected field</span> to the correct <span class="fw-bold text-light bg-secondary px-1 rounded">CSV column</span> from your uploaded file.</p>
+            <form method="post" id="mappingForm" action="map_columns.php">
+                <div class="text-end mb-3">
+                    <button type="submit" class="btn btn-primary">Continue to Dashboard</button>
+                </div>
+                <div class="table-responsive mb-4">
+                    <table class="table table-dark table-bordered align-middle w-100" style="min-width: 400px; table-layout: fixed;">
+                        <colgroup>
+                            <col style="width: 60%;">
+                            <col style="width: 40%;">
+                        </colgroup>
                         <thead>
                             <tr>
-                                <?php
-                                // Use $headersOrdered for preview
-                                foreach ($headersOrdered as $h): ?>
-                                    <th><?php echo htmlspecialchars($h); ?></th>
-                                <?php endforeach; ?>
+                                <th class="text-center">CSV Column</th>
+                                <th class="text-center">Expected Field (App)</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <?php foreach ($previewRows as $row): ?>
+                            <?php foreach ($expectedFields as $field): ?>
                                 <tr>
-                                    <?php
-                                    // Reorder row to match $headersOrdered
-                                    $rowAssoc = array_combine($headers, $row);
-                                    foreach ($headersOrdered as $h):
-                                        $cell = $rowAssoc[$h] ?? '';
-                                    ?>
-                                        <td><?php echo htmlspecialchars($cell); ?></td>
-                                    <?php endforeach; ?>
+                                    <td>
+                                        <select name="mapping[<?php echo htmlspecialchars($field); ?>]" class="form-select mapping-dropdown" data-field="<?php echo htmlspecialchars($field); ?>" required>
+                                            <option value="">-- Select CSV column --</option>
+                                            <?php
+                                            // Use $headersOrdered for dropdowns
+                                            foreach ($headersOrdered as $h): ?>
+                                                <option value="<?php echo htmlspecialchars($h); ?>"
+                                                    <?php if (strtolower($h) === strtolower($field)) echo 'selected'; ?>>
+                                                    <?php echo htmlspecialchars($h); ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <span class="fw-bold text-info"><?php echo htmlspecialchars($field); ?></span>
+                                    </td>
                                 </tr>
                             <?php endforeach; ?>
                         </tbody>
                     </table>
                 </div>
-            </div>
-        </form>
+                <div class="mb-4">
+                    <label class="form-label fw-bold">CSV Preview (first 5 rows):</label>
+                    <div class="table-responsive">
+                        <table class="table table-dark table-bordered mb-0">
+                            <thead>
+                                <tr>
+                                    <?php
+                                    // Use $headersOrdered for preview
+                                    foreach ($headersOrdered as $h): ?>
+                                        <th><?php echo htmlspecialchars($h); ?></th>
+                                    <?php endforeach; ?>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($previewRows as $row): ?>
+                                    <tr>
+                                        <?php
+                                        // Reorder row to match $headersOrdered
+                                        $rowAssoc = array_combine($headers, $row);
+                                        foreach ($headersOrdered as $h):
+                                            $cell = $rowAssoc[$h] ?? '';
+                                        ?>
+                                            <td><?php echo htmlspecialchars($cell); ?></td>
+                                        <?php endforeach; ?>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <footer class="mt-4 text-center text-secondary small">
+            <a href="https://jeroenict.be" target="_blank" rel="noopener">
+                <img src="assets/img/logo-transp-green.png" alt="Jeroen ICT Logo" style="height: 40px; opacity: 0.9; border-radius: 0.5rem;">
+            </a>
+        </footer>
     </div>
     <script>
     document.addEventListener("DOMContentLoaded", function() {
