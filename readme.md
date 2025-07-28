@@ -1,5 +1,7 @@
 # PacketProbe
 
+<img width="1691" height="890" alt="Image" src="https://github.com/user-attachments/assets/d2ec211b-428f-40bc-bf15-d27ef11a7bab" />
+
 PacketProbe is an educational web application for analyzing network packet captures (CSV format). It provides an interactive dashboard for exploring network protocols, traffic patterns, and anomalies, making it ideal for networking and cybersecurity education.
 
 ## Features
@@ -117,8 +119,6 @@ Examples:
 <img width="1691" height="890" alt="Image" src="https://github.com/user-attachments/assets/f113a7ae-7255-42ac-8293-aa93a5782d8a" />
 
 <img width="1691" height="890" alt="Image" src="https://github.com/user-attachments/assets/5e64065c-187c-448c-b3c1-6b5b8079af11" />
-
-<img width="1691" height="890" alt="Image" src="https://github.com/user-attachments/assets/d2ec211b-428f-40bc-bf15-d27ef11a7bab" />
 
 <img width="1691" height="890" alt="Image" src="https://github.com/user-attachments/assets/57b9182d-7e22-4b37-839d-ee6c1713dba1" />
 
