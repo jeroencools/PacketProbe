@@ -109,3 +109,18 @@ This project is for educational purposes.
 
 Home:
 <img width="1691" height="890" alt="Image" src="https://github.com/user-attachments/assets/f7c6167c-9049-41b4-ae05-37885c1e6dc2" />
+
+CSV mapping:
+<img width="1691" height="890" alt="Image" src="https://github.com/user-attachments/assets/d442aff2-8e4a-42d6-b728-2182e42240e8" />
+
+Examples:
+<img width="1691" height="890" alt="Image" src="https://github.com/user-attachments/assets/f113a7ae-7255-42ac-8293-aa93a5782d8a" />
+
+<img width="1691" height="890" alt="Image" src="https://github.com/user-attachments/assets/5e64065c-187c-448c-b3c1-6b5b8079af11" />
+
+<img width="1691" height="890" alt="Image" src="https://github.com/user-attachments/assets/d2ec211b-428f-40bc-bf15-d27ef11a7bab" />
+
+<img width="1691" height="890" alt="Image" src="https://github.com/user-attachments/assets/57b9182d-7e22-4b37-839d-ee6c1713dba1" />
+
+Dark mode:
+<img width="1691" height="890" alt="image" src="https://github.com/user-attachments/assets/6400c187-0107-4b94-8ca9-5180430c0b2d" />
