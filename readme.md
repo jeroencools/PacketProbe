@@ -105,3 +105,7 @@ Contributions are welcome! Fork the repository and submit a pull request.
 
 This project is for educational purposes.
 
+## Screenshots
+
+Home:
+<img width="1691" height="890" alt="Image" src="https://github.com/user-attachments/assets/f7c6167c-9049-41b4-ae05-37885c1e6dc2" />
